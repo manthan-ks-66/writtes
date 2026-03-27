@@ -52,7 +52,6 @@ const generateUserTokens = async ({ user }) => {
     const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
-
     await user.save();
 
     const loggedInUser = user.toJSON();
