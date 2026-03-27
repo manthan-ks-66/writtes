@@ -119,6 +119,22 @@ class AuthService {
     }
   }
 
+  async refreshUserAccessToken() {
+    try {
+      const res = await axios.post(
+        `${this.usersBaseUrl}/refresh-access-token`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+
+      return res.data?.data;
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
   async sendResetPasswordOTP({ email }) {
     try {
       const response = await axios.post(

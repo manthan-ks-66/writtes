@@ -26,7 +26,7 @@ import Home from "./components/Home.jsx";
 import About from "./components/About.jsx";
 import NotFound from "./components/NotFound.jsx";
 
-// routes guard
+// Protection Container 
 import AuthLayout from "./components/AuthLayout.jsx";
 
 // Post components
@@ -35,7 +35,7 @@ import Explore from "./components/Post/Explore.jsx";
 import QueryPosts from "./components/Post/QueryPosts.jsx";
 import Author from "./components/Post/Author.jsx";
 
-// protected Post components
+// Protected publish post component
 import PublishPost from "./components/Post/PublishPost.jsx";
 
 // Users components (under protected routes - /user)

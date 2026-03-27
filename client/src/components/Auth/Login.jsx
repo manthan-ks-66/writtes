@@ -45,7 +45,7 @@ function Login() {
         dispatch(login(user));
 
         notify.api.success({
-          title: "Welcome Back",
+          title: `Welcome Back, ${user.fullName}`,
           description: "You are now logged in",
           placement: "top",
         });

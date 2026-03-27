@@ -85,7 +85,7 @@ function AlignTool({ editor }) {
 
   return (
     <div style={{ width: "100px" }} className="tool">
-      <Dropdown menu={{ items: alignmentItems }}>
+      <Dropdown trigger="click" menu={{ items: alignmentItems }}>
         <div style={{ display: "flex", gap: 10 }}>
           {currentIcon}
           <span style={{ textTransform: "capitalize" }}>{currentAlign}</span>

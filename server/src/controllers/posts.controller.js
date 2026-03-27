@@ -11,7 +11,7 @@ import { uploadToImageKit } from "../utils/imagekit.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import jwt from "jsonwebtoken";
 
-// Controller: Upload post
+// Posts Controllers
 const publishPost = asyncHandler(async (req, res) => {
   const { title, slug, content, category } = req.body;
 
@@ -60,7 +60,6 @@ const publishPost = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, "Post published successfully", publishedPost));
 });
 
-// Controller: Update the post
 const updatePost = asyncHandler(async (req, res) => {
   const { title, content, slug, category } = req.body;
 
@@ -116,7 +115,6 @@ const updatePost = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Post updated successfully", updatedPost));
 });
 
-// Controller: Get all posts in pages
 const getAllPosts = asyncHandler(async (req, res) => {
   const { page = 1, limit = 5 } = req.query;
 
@@ -137,7 +135,6 @@ const getAllPosts = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Posts fetched successfully", data));
 });
 
-// Controller: get posts on query
 const getQueryPosts = asyncHandler(async (req, res) => {
   const { query, page = 1, limit = 5 } = req.query;
 
@@ -170,7 +167,6 @@ const getQueryPosts = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Query posts fetched successfully", data));
 });
 
-// Controller: Toggle Post like
 const togglePostLike = asyncHandler(async (req, res) => {
   const { postId } = req.body;
 
@@ -224,7 +220,6 @@ const togglePostLike = asyncHandler(async (req, res) => {
   }
 });
 
-// Controller: Get Post
 const fetchPost = asyncHandler(async (req, res) => {
   const { postId } = req.params;
 
@@ -239,7 +234,10 @@ const fetchPost = asyncHandler(async (req, res) => {
     try {
       decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     } catch (error) {
-      throw new ApiError(400, "Token expired", error);
+      if (error instanceof jwt.TokenExpiredError) {
+        // continue fetchPost for guest
+      }
+      throw new ApiError(400, "Invalid JWT Token");
     }
   }
 
@@ -271,7 +269,7 @@ const fetchPost = asyncHandler(async (req, res) => {
       $lookup: {
         from: "postlikes",
 
-        // at this stage we are still in the posts context (packing our box let post_id)
+        // at this stage we are still in the posts context (packing our box - let post_id)
         let: { post_id: "$_id" },
 
         // sub pipeline to implement the $ match stage to filter out (now we will be in postlikes collection)
@@ -321,7 +319,6 @@ const fetchPost = asyncHandler(async (req, res) => {
         },
         isLiked: {
           $cond: {
-
             // if $ size returns array as 1 flag gets true and if 0 flag gets false
             if: { $gt: [{ $size: "$userLikedStatus" }, 0] },
             then: true,

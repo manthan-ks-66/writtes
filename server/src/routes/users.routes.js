@@ -16,6 +16,7 @@ import {
   updateUserDetails,
   getUserLikedPosts,
   removeUserAvatar,
+  refreshAccessToken,
 } from "../controllers/users.controller.js";
 const router = Router();
 
@@ -35,6 +36,10 @@ router.route("/reset-user-password").post(resetUserPassword);
 
 router.route("/get-author/:username").get(fetchAuthor);
 
+router.route("/refresh-access-token").post(refreshAccessToken);
+
+router.route("/get-current-user").get(getCurrentUser);
+
 // secured routes
 router.route("/logout").post(verifyJWT, logoutUser);
 
@@ -45,8 +50,6 @@ router
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
 
 router.route("/remove-avatar").patch(verifyJWT, removeUserAvatar);
-
-router.route("/get-current-user").get(verifyJWT, getCurrentUser);
 
 router.route("/update-user-details").patch(verifyJWT, updateUserDetails);
 

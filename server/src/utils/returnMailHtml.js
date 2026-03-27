@@ -1,9 +1,7 @@
-const returnHTML = function (processMsg, user, email, subject, otp) {
-  if ([processMsg, user, email, subject, otp].some((field) => !field)) {
+const returnHTML = function (processMsg, firstName, email, subject, otp) {
+  if ([processMsg, email, subject, otp].some((field) => !field)) {
     return "";
   }
-
-  const firstName = user.fullName.trim().split(" ")[0];
 
   return `
 <!DOCTYPE html>
@@ -53,12 +51,12 @@ const returnHTML = function (processMsg, user, email, subject, otp) {
             <td style="padding: 36px 40px 12px 40px; text-align: center; color: #1f2937;">
 
               <h2 style="font-family: 'Noto Sans', 'PingFang SC', 'Alibaba PuHuiTi', sans-serif; font-size: 22px; font-weight: 400; margin: 0 0 12px 0; color: #0f172a;">
-                Hi ${firstName},
+                Hi ${firstName}
               </h2>
 
               <p style="font-size: 15px; line-height: 26px; color: #4b5563; margin: 0 0 32px 0; font-weight: 400;">
                 To continue with <span>${processMsg}</span> on PROSE,<br>
-                please use the One-Time Password below.
+                Use the One-Time Password given below.
               </p>
 
               <!-- OTP Box -->
@@ -75,7 +73,7 @@ const returnHTML = function (processMsg, user, email, subject, otp) {
                 <tr>
                   <td style="background-color: #fef9ec; padding: 10px 20px; text-align: center;">
                     <p style="font-size: 13px; color: #92400e; margin: 0; font-weight: 400;">
-                      ⏱&nbsp; This OTP is valid for 2 minutes only.
+                      ⏱&nbsp; The OTP is valid only for 2 minutes.
                     </p>
                   </td>
                 </tr>
@@ -107,7 +105,7 @@ const returnHTML = function (processMsg, user, email, subject, otp) {
 
         <!-- Footer note -->
         <p style="font-size: 12px; color: #94a3b8; margin-top: 24px; text-align: center; letter-spacing: 0.5px; font-weight: 400;">
-          &copy; 2026 Prose. All rights reserved.
+          &copy; 2026 PROSE. All rights reserved.
         </p>
 
       </td>

@@ -116,7 +116,7 @@ function UserProfile() {
         dispatch(update(user));
 
         notify.api.success({
-          message: "Avatar Updated Successfully",
+          title: "Avatar Updated Successfully",
           placement: "top",
         });
       }

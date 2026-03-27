@@ -18,8 +18,8 @@ function App() {
         const user = res.data?.data;
         if (user) dispatch(login(user));
       })
-      .catch((err) => {
-        console.log(err.message);
+      .catch((error) => {
+        console.log(error);
       })
       .finally(() => setLoader(false));
   }, [dispatch]);

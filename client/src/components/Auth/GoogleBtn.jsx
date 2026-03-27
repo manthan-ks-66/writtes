@@ -47,7 +47,7 @@ const GoogleBtn = () => {
           dispatch(login(user));
 
           notify.api.success({
-            title: "Welcome to PROSE",
+            title: `Welcome, ${user.fullName}`,
             description: "Your are now logged in",
             placement: "top",
           });

@@ -26,8 +26,7 @@ const textTypeOptions = [
   },
 ];
 
-function TextTypeTool({ editor }) {
-
+function HeadingTool({ editor }) {
   const formatting = (size) => {
     editor.update(() => {
       const selection = $getSelection();
@@ -53,4 +52,4 @@ function TextTypeTool({ editor }) {
   );
 }
 
-export default TextTypeTool;
+export default HeadingTool;

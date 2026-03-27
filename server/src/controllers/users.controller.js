@@ -20,20 +20,22 @@ import { Resend } from "resend";
 // Resend mail config
 const resend = new Resend(process.env.RESEND_VERIFICATION_MAIL_API_KEY);
 
+// http cookie options
 const options = {
   httpOnly: true,
   secure: true,
   sameSite: "None",
 };
 
-// user one time passcode generator method
+// user OTP generator method
 const generateAndSendOTP = async (processMsg, user, email, subject) => {
   const otp = randomInt(100000, 999999);
 
   await user.hashOTP(otp);
   await user.save();
 
-  const mailHTML = returnHTML(processMsg, user, email, subject, otp);
+  const firstName = user.fullName.trim().split(" ")[0];
+  const mailHTML = returnHTML(processMsg, firstName, email, subject, otp);
 
   await resend.emails.send({
     from: "PROSE <noreply@verify.onprose.tech>",
@@ -43,7 +45,7 @@ const generateAndSendOTP = async (processMsg, user, email, subject) => {
   });
 };
 
-// generate user accessToken and refreshToken
+// generate user accessToken and refreshToken for login
 const generateUserTokens = async ({ user }) => {
   try {
     const accessToken = user.generateAccessToken();
@@ -107,7 +109,7 @@ const registerUser = asyncHandler(async (req, res) => {
       "registration process",
       existedUser,
       email,
-      "One Time Password for user registration",
+      "User Registration OTP",
     );
 
     const verificationToken = existedUser.generateVerificationToken();
@@ -191,11 +193,7 @@ const regenerateRegistrationOTP = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(
-        200,
-        "OTP re-sent to the registered email successfully",
-        {},
-      ),
+      new ApiResponse(200, "OTP re-sent to the registered email successfully"),
     );
 });
 
@@ -313,10 +311,11 @@ const authenticateWithGoogle = asyncHandler(async (req, res) => {
   } else {
     /**
      * Priority 2 - find the user by email (in case user is registered locally)
+  
      * this else case will only run when user from the googleId is not found - then find the user by email
      * if the user from the email is still not found then create user to proceed further for login
-     *
-     * - if user by googleId is found the logic proceeds to login user
+
+     * - if user by googleId is found the logic proceeds to generate user tokens (login)
      */
     user = await User.findOne({ email });
 
@@ -512,7 +511,24 @@ const removeUserAvatar = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  const user = req.user;
+  const accessToken = req.cookies?.accessToken;
+  let decodedToken;
+
+  if (!accessToken) {
+    throw new ApiError(400, "Token is missing - Session Expired");
+  }
+
+  try {
+    decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new ApiError(401, "Token Expired");
+    }
+
+    throw new ApiError(401, "Unauthorized - Invalid Token");
+  }
+
+  const user = await User.findOne({ _id: decodedToken._id });
 
   if (!user) {
     throw new ApiError(400, "Invalid token or Token is expired");
@@ -520,7 +536,9 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "User details fetched successfully", user));
+    .json(
+      new ApiResponse(200, "User details fetched successfully", user.toJSON()),
+    );
 });
 
 const handleResetPasswordOTP = asyncHandler(async (req, res) => {
@@ -693,37 +711,33 @@ const updateUserDetails = asyncHandler(async (req, res) => {
     );
 });
 
-// TODO: Postman testing
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingToken = req.cookies?.refreshToken;
+  let decodedToken;
 
   if (!incomingToken) {
-    throw new ApiError(400, "User Unauthenticated");
+    throw new ApiError(400, "Refresh token is missing");
   }
 
-  const decodedToken = jwt.verify(
-    incomingToken,
-    process.env.REFRESH_TOKEN_SECRET,
-  );
+  try {
+    decodedToken = jwt.verify(incomingToken, process.env.REFRESH_TOKEN_SECRET);
+  } catch (error) {
+    throw new ApiError(401, "Token Expired - Please Login");
+  }
 
-  const user = await User.findById(decodedToken._id);
+  const user = await User.findOne({ _id: decodedToken._id });
 
   if (!user) {
-    throw new ApiError(400, "Invalid token");
+    throw new ApiError(400, "User not found");
   }
 
   if (user.refreshToken !== incomingToken) {
     throw new ApiError(400, "Refresh token is Invalid");
   }
 
-  const { loggedInUser, accessToken, refreshToken } = await generateUserTokens(
-    user._id,
-  );
-
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
+  const { loggedInUser, accessToken, refreshToken } = await generateUserTokens({
+    user,
+  });
 
   return res
     .status(200)
@@ -817,7 +831,7 @@ const fetchAuthor = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Username is required");
   }
 
-  let dbUsername = username;
+  let dbUsername;
 
   if (username[0] === "@") {
     dbUsername = username.replace("@", "");
