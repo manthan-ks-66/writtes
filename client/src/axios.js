@@ -1,16 +1,11 @@
 import axios from "axios";
 
-axios.interceptors.response.use(
-  function onFulfilled(response) {
-    // Any status code that lie within the range of 2xx cause this function to trigger
-    // Do something with response data
-    return response;
-  },
-  function onRejected(error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
-    console.log("axios interceptor: \n", error);
-    return Promise.reject(error);
-  },
-);
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:3000/api/v1/users/get-current-user",
+});
 
+axiosInstance.interceptors.response.use(undefined, async (error) => {
+  if (error.response?.status === 401) {
+    console.log("the 401 error is intercepted...");
+  }
+});

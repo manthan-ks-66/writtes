@@ -2,7 +2,7 @@
 import { User } from "../models/users.model.js";
 import { PostLike } from "../models/postLikes.model.js";
 
-// utilities and built-in methods
+// utilities and method imports
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { uploadToImageKit, deleteImageKitFile } from "../utils/imagekit.js";
@@ -17,7 +17,7 @@ import { OAuth2Client } from "google-auth-library";
 import { Resend } from "resend";
 
 // Methods and configs:
-// Resend mail config
+// Resend config
 const resend = new Resend(process.env.RESEND_VERIFICATION_MAIL_API_KEY);
 
 // http cookie options
@@ -71,7 +71,7 @@ const generateUniqueUsername = (given_name, sub) => {
   return username;
 };
 
-// Controllers:
+// User Controllers:
 const registerUser = asyncHandler(async (req, res) => {
   const { email, username, fullName, password } = req.body;
 
@@ -204,8 +204,8 @@ const verifyAndLoginUser = asyncHandler(async (req, res) => {
    * check if otp is expired
    * check if otp is correct
    * update the user as verified
-   * generate user tokens to login the user
-   * return res - user login
+   * generate user tokens for login
+   * return res - login
    */
 
   const { otp } = req.body;
@@ -303,7 +303,8 @@ const authenticateWithGoogle = asyncHandler(async (req, res) => {
 
   if (user) {
     // in case if user has updated the email at google
-    if (user.email !== email) {
+    if (user.email !== email || user.fullName !== name) {
+      user.fullName = name;
       user.email = email;
       await user.save();
     }
@@ -365,12 +366,13 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({
     $or: [{ username }, { email: username }],
-  });
+  }).select("+password");
 
   if (!user) {
     throw new ApiError(401, "User does not exist");
   }
 
+  // in case if user registered with google
   if (user.authProvider === "google" && !user.password) {
     throw new ApiError(400, "Invalid user credentials");
   }
@@ -378,7 +380,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const isPasswordValid = await user.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
-    throw new ApiError(401, "Invalid user credentials");
+    throw new ApiError(400, "Invalid user credentials");
   }
 
   const { loggedInUser, accessToken, refreshToken } = await generateUserTokens({
@@ -460,7 +462,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
       }
     }
 
-    throw new ApiError(400, "User avatar update failed");
+    throw new ApiError(500, "User avatar update failed");
   }
 
   if (oldFileId) {
@@ -496,7 +498,7 @@ const removeUserAvatar = asyncHandler(async (req, res) => {
   try {
     await deleteImageKitFile(fileId);
   } catch (error) {
-    console.log("Imagekit file deletion failed", error.message);
+    console.log("Imagekit file deletion failed", fileId);
   }
 
   user.avatar = null;
@@ -510,27 +512,10 @@ const removeUserAvatar = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  const accessToken = req.cookies?.accessToken;
-  let decodedToken;
-
-  if (!accessToken) {
-    throw new ApiError(400, "Token is missing - Session Expired");
-  }
-
-  try {
-    decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-  } catch (error) {
-    if (error instanceof jwt.TokenExpiredError) {
-      throw new ApiError(401, "Token Expired");
-    }
-
-    throw new ApiError(401, "Unauthorized - Invalid Token");
-  }
-
-  const user = await User.findOne({ _id: decodedToken._id });
+  const user = req.user;
 
   if (!user) {
-    throw new ApiError(400, "Invalid token or Token is expired");
+    throw new ApiError(400, "User not found");
   }
 
   return res
@@ -605,6 +590,9 @@ const resetUserPassword = asyncHandler(async (req, res) => {
     */
 
   const { otp, newPassword, confirmNewPassword } = req.body;
+  const verificationToken = req.cookies?.verificationToken;
+
+  let decodedToken;
 
   if (
     [otp, newPassword, confirmNewPassword].some(
@@ -618,19 +606,25 @@ const resetUserPassword = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Password doesn't match with confirmed password");
   }
 
-  const verificationToken = req.cookies?.verificationToken;
-
   if (!verificationToken) {
     throw new ApiError(
       400,
-      "Invalid request: User has not requested for password update",
+      "Invalid request - User has not requested for password update",
     );
   }
 
-  const decodedToken = jwt.verify(
-    verificationToken,
-    process.env.VERIFICATION_TOKEN_SECRET,
-  );
+  try {
+    decodedToken = jwt.verify(
+      verificationToken,
+      process.env.VERIFICATION_TOKEN_SECRET,
+    );
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new ApiError(400, "Session Expired");
+    }
+
+    throw new ApiError(400, "Invalid token");
+  }
 
   const user = await User.findOne({ _id: decodedToken._id });
 
@@ -715,23 +709,29 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   let decodedToken;
 
   if (!incomingToken) {
-    throw new ApiError(400, "Refresh token is missing");
+    throw new ApiError(400, "Token is missing");
   }
 
   try {
     decodedToken = jwt.verify(incomingToken, process.env.REFRESH_TOKEN_SECRET);
   } catch (error) {
-    throw new ApiError(401, "Token Expired - Please Login");
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new ApiError(400, "Session Expired - Please login");
+    }
+
+    throw new ApiError(400, "Invalid Token");
   }
 
-  const user = await User.findOne({ _id: decodedToken._id });
+  const user = await User.findOne({ _id: decodedToken._id }).select(
+    "+refreshToken",
+  );
 
   if (!user) {
     throw new ApiError(400, "User not found");
   }
 
   if (user.refreshToken !== incomingToken) {
-    throw new ApiError(400, "Refresh token is Invalid");
+    throw new ApiError(400, "Invalid Token");
   }
 
   const { loggedInUser, accessToken, refreshToken } = await generateUserTokens({
@@ -809,7 +809,9 @@ const getUserLikedPosts = asyncHandler(async (req, res) => {
   ]);
 
   if (userLikedPosts.length === 0) {
-    throw new ApiError(400, "No Posts found!");
+    return res
+      .status(200)
+      .json(new ApiResponse(200, "You have not liked any post", []));
   }
 
   return res
@@ -825,15 +827,16 @@ const getUserLikedPosts = asyncHandler(async (req, res) => {
 
 const fetchAuthor = asyncHandler(async (req, res) => {
   const { username } = req.params;
+  let dbUsername;
 
   if (!username) {
     throw new ApiError(400, "Username is required");
   }
 
-  let dbUsername;
-
   if (username[0] === "@") {
     dbUsername = username.replace("@", "");
+  } else {
+    dbUsername = username;
   }
 
   const author = await User.findOne(

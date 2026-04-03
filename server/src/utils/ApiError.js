@@ -8,3 +8,5 @@ class ApiError extends Error {
 }
 
 export { ApiError };
+
+// research on super(message)

@@ -29,9 +29,12 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
+      select: false,
     },
     refreshToken: {
       type: String,
+      select: false,
+      // use the .select() to include the refreshToken whenever required
     },
     isVerified: {
       type: Boolean,
@@ -64,7 +67,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    likedIn: {
+    linkedIn: {
       type: String,
       default: "",
     },
@@ -81,13 +84,16 @@ const userSchema = new mongoose.Schema(
     OTP: {
       type: String,
       default: undefined,
+      select: false,
     },
     otpExpiry: {
       type: Date,
       default: undefined,
+      select: false,
     },
     lifeTime: {
       type: Date,
+      select: false,
       index: { expires: "24hr" },
     },
   },
@@ -178,6 +184,7 @@ userSchema.methods.generateVerificationToken = function () {
 
 // password validation:
 userSchema.methods.isPasswordCorrect = async function (password) {
+  if (!this.password) return false;
   return await bcrypt.compare(password, this.password);
 };
 

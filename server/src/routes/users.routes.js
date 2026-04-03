@@ -38,9 +38,9 @@ router.route("/get-author/:username").get(fetchAuthor);
 
 router.route("/refresh-access-token").post(refreshAccessToken);
 
-router.route("/get-current-user").get(getCurrentUser);
-
 // secured routes
+router.route("/get-current-user").get(verifyJWT, getCurrentUser);
+
 router.route("/logout").post(verifyJWT, logoutUser);
 
 router.route("/get-user-liked-posts").get(verifyJWT, getUserLikedPosts);

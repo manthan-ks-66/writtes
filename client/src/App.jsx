@@ -7,6 +7,7 @@ import authService from "./services/authService.js";
 import { useDispatch } from "react-redux";
 import { login } from "./store/authSlice.js";
 
+
 function App() {
   const [loader, setLoader] = useState(true);
   const dispatch = useDispatch();

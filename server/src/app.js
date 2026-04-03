@@ -42,15 +42,15 @@ app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/posts", postsRouter);
 app.use("/api/v1/comments", commentsRouter);
 
-app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Something went wrong";
+// app.use((err, req, res, next) => {
+//   const statusCode = err.statusCode || 500;
+//   const message = err.message || "Something went wrong";
 
-  return res.status(statusCode).json({
-    success: false,
-    message: message,
-    errors: err.errors || [],
-  });
-});
+//   return res.status(statusCode).json({
+//     success: false,
+//     message: message,
+//     errors: err.errors || [],
+//   });
+// });
 
 export default app;

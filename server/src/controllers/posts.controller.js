@@ -11,7 +11,7 @@ import { uploadToImageKit } from "../utils/imagekit.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import jwt from "jsonwebtoken";
 
-// Posts Controllers
+// Post Controllers
 const publishPost = asyncHandler(async (req, res) => {
   const { title, slug, content, category } = req.body;
 
@@ -107,7 +107,7 @@ const updatePost = asyncHandler(async (req, res) => {
   const updatedPost = await post.save({ validateBeforeSave: true });
 
   if (!updatedPost) {
-    throw new ApiError(500, "Something went wrong");
+    throw new ApiError(500, "Failed to update post");
   }
 
   return res
@@ -235,13 +235,13 @@ const fetchPost = asyncHandler(async (req, res) => {
       decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
-        // continue fetchPost for guest
+        // continue to fetch the post for logged out user
       }
-      throw new ApiError(400, "Invalid JWT Token");
+      throw new ApiError(400, "Invalid Session Id");
     }
   }
 
-  // access userId (likedBy) if user is present to find whether user has liked the post
+  // access userId ( likedBy ) if user is present to find whether user has liked the post
   const userId = decodedToken
     ? new mongoose.Types.ObjectId(decodedToken._id)
     : null;
@@ -269,7 +269,7 @@ const fetchPost = asyncHandler(async (req, res) => {
       $lookup: {
         from: "postlikes",
 
-        // at this stage we are still in the posts context (packing our box - let post_id)
+        // at this stage we are still in the posts context (packing our box -> let post_id)
         let: { post_id: "$_id" },
 
         // sub pipeline to implement the $ match stage to filter out (now we will be in postlikes collection)
@@ -338,7 +338,6 @@ const fetchPost = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Post fetched successfully", post[0]));
 });
 
-// Controller: Editor image file upload
 const uploadEditorImage = asyncHandler(async (req, res) => {
   const editorImageLocalPath = req.file?.path;
 

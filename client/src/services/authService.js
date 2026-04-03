@@ -1,4 +1,5 @@
 import axios from "axios";
+import { usersInstance } from "./axiosInstance.js";
 import handleError from "./errorHandler.js";
 
 class AuthService {
@@ -77,46 +78,22 @@ class AuthService {
   }
 
   async loginUser({ username, password }) {
-    try {
-      const response = await axios.post(
-        `${this.usersBaseUrl}/login`,
-        {
-          username,
-          password,
-        },
-        {
-          withCredentials: true,
-        },
-      );
+    const response = await usersInstance.post("/login", {
+      username,
+      password,
+    });
 
-      return response?.data?.data?.user;
-    } catch (error) {
-      handleError(error);
-    }
+    return response.data?.data?.user;
   }
 
   async logoutUser() {
-    try {
-      await axios.post(
-        `${this.usersBaseUrl}/logout`,
-        {},
-        {
-          withCredentials: true,
-        },
-      );
-    } catch (error) {
-      handleError(error);
-    }
+    await usersInstance.post("/logout", {});
   }
 
   async getCurrentUser() {
-    try {
-      return await axios.get(`${this.usersBaseUrl}/get-current-user`, {
-        withCredentials: true,
-      });
-    } catch (error) {
-      handleError(error);
-    }
+    const response = await usersInstance.get("/get-current-user");
+
+    return response;
   }
 
   async refreshUserAccessToken() {
@@ -136,21 +113,11 @@ class AuthService {
   }
 
   async sendResetPasswordOTP({ email }) {
-    try {
-      const response = await axios.post(
-        `${this.usersBaseUrl}/initiate-reset-password-otp`,
-        {
-          email,
-        },
-        {
-          withCredentials: true,
-        },
-      );
+    const response = await usersInstance.post("/initiate-reset-password-otp", {
+      email,
+    });
 
-      return response.data;
-    } catch (error) {
-      handleError(error);
-    }
+    return response.data;
   }
 
   async resetUserPassword(data) {
