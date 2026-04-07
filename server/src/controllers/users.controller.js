@@ -520,9 +520,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      new ApiResponse(200, "User details fetched successfully", user.toJSON()),
-    );
+    .json(new ApiResponse(200, "User details fetched successfully", user));
 });
 
 const handleResetPasswordOTP = asyncHandler(async (req, res) => {
@@ -573,19 +571,13 @@ const handleResetPasswordOTP = asyncHandler(async (req, res) => {
 const resetUserPassword = asyncHandler(async (req, res) => {
   /**
     * get verificationToken, otp, newPassword, confirmNewPassword from req
-
     * check newPassword is equal to confirmNewPassword
-
     * find the user from the db by decoding the token
-      - throw error if user is not registered
-
+        - throw error if user is not registered
     * check if the otp is expired 
-      - throw error if Date.now is > otpExpiry
-
+        - throw error if Date.now is > otpExpiry
     * check if otp is correct 
-
     * update the user password in the db and set the passwordResetOTP and otpExpiry field as null 
-
     * return res - password updated
     */
 

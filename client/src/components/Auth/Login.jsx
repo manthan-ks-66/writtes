@@ -40,8 +40,6 @@ function Login() {
   const handleLogin = async (userData) => {
     try {
       const user = await authService.loginUser(userData);
-      console.log("user: \n", user);
-
       if (user) {
         dispatch(login(user));
 

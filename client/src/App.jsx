@@ -4,26 +4,25 @@ import AntdSpin from "./components/AntdSpin.jsx";
 // methods and services
 import { useEffect, useState } from "react";
 import authService from "./services/authService.js";
-import { useDispatch } from "react-redux";
-import { login } from "./store/authSlice.js";
-
+import { useDispatch, useSelector } from "react-redux";
+import { login, logout } from "./store/authSlice.js";
 
 function App() {
   const [loader, setLoader] = useState(true);
   const dispatch = useDispatch();
+  const authStatus = useSelector((state) => state.auth.authStatus);
 
   useEffect(() => {
     authService
       .getCurrentUser()
-      .then((res) => {
-        const user = res.data?.data;
+      .then((user) => {
         if (user) dispatch(login(user));
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(() => {
+        dispatch(logout());
       })
       .finally(() => setLoader(false));
-  }, [dispatch]);
+  }, [dispatch, authStatus]);
 
   return !loader ? <Outlet /> : <AntdSpin />;
 }
