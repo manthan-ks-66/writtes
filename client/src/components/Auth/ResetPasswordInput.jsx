@@ -8,7 +8,7 @@ import { useNotify } from "../../context/NotificationProvider";
 
 const { Title, Text } = Typography;
 
-function ResetPassword() {
+function ResetPasswordInput() {
   const { token } = theme.useToken();
   const notify = useNotify();
   const {
@@ -184,4 +184,4 @@ function ResetPassword() {
   );
 }
 
-export default ResetPassword;
+export default ResetPasswordInput;

@@ -2,7 +2,6 @@
 import { Button, Input, Typography, Flex, Card, message, Layout } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { theme } from "antd";
-import { Navigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -18,20 +17,17 @@ import { useNotify } from "../../context/NotificationProvider.jsx";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-const OtpVerification = () => {
+const RegistrationOtpInput = () => {
   const email = sessionStorage.getItem("email");
 
+  const { token } = theme.useToken();
+
   const [error, setError] = useState();
-
   const [otp, setOTP] = useState();
-
   const dispatch = useDispatch();
-
   const notify = useNotify();
-
   const navigate = useNavigate();
 
-  const { token } = theme.useToken();
 
   const handleVerify = async () => {
     try {
@@ -155,4 +151,4 @@ const OtpVerification = () => {
   );
 };
 
-export default OtpVerification;
+export default RegistrationOtpInput;

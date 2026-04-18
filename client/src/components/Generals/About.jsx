@@ -53,7 +53,7 @@ function About() {
         <div style={{ textAlign: "center", marginBottom: 60 }}>
           <Title level={2} style={{ fontSize: "24px", letterSpacing: "1px" }}>
             The Story of{" "}
-            <span style={{ color: token.colorPrimary }}>PROSE</span>
+            <span style={{ color: token.colorPrimary }}>WRITTES</span>
           </Title>
           <Paragraph
             style={{

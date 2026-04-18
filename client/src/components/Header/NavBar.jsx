@@ -16,8 +16,8 @@ import {
   SearchOutlined,
   MenuOutlined,
   SettingOutlined,
-  EditOutlined,
   PoweroffOutlined,
+  FormOutlined,
 } from "@ant-design/icons";
 import "./NavBar.css";
 
@@ -54,21 +54,24 @@ function NavBar() {
 
   const toggleDrawer = () => setDrawerVisible(!drawerVisible);
 
-  const logoutUser = async () => {
+  const handleLogout = async () => {
     authService
       .logoutUser()
       .then(() => {
         dispatch(logout());
 
         notify.api.success({
-          title: "Logged out successfully",
+          title: "You are now logged out",
           placement: "top",
         });
 
         navigate("/");
       })
       .catch((err) => {
-        throw new Error(err.message);
+        notify.api.error({
+          title: err.message,
+          placement: "top",
+        });
       });
   };
 
@@ -83,31 +86,31 @@ function NavBar() {
     },
     {
       label: "Explore",
-      key: "/explore-posts?page=1&limit=5",
+      key: "/explore?page=1&limit=5",
     },
     {
       label: "Write",
       key: "/post/new/write",
-      icon: <EditOutlined />,
+      icon: <FormOutlined />,
     },
   ];
 
   const userItems = [
     {
       label: "Profile",
-      key: `/user/@${user?.username}`,
+      key: "/account/manage-profile",
       icon: <UserOutlined />,
     },
     {
       label: "Settings",
-      key: "/user-settings",
+      key: "/account/settings",
       icon: <SettingOutlined />,
     },
     {
       label: "Logout",
       danger: true,
       icon: <PoweroffOutlined />,
-      onClick: logoutUser,
+      onClick: handleLogout,
     },
   ];
 
@@ -119,7 +122,7 @@ function NavBar() {
           height: HEADER_HEIGHT,
           display: "flex",
           alignItems: "center",
-          padding: "0 80px",
+          padding: "0 60px",
           justifyContent: user ? "center" : "space-between",
           position: "fixed",
           zIndex: 1000,
@@ -159,7 +162,7 @@ function NavBar() {
             defaultSelectedKeys={["2"]}
             items={navItems}
             style={{
-              marginLeft: "3vw",
+              marginLeft: "2vw",
               flex: 1,
               justifyContent: "flex-start",
               minWidth: 0,

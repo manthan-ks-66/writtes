@@ -117,13 +117,6 @@ function PublishPost() {
     >
       <Content>
         <div style={containerStyle}>
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
-            <Title level={3} style={{ margin: 0, fontSize: "22px" }}>
-              Create Your New{" "}
-              <span style={{ color: token.colorPrimary }}>Post</span>
-            </Title>
-          </div>
-
           <Form
             form={form}
             layout="vertical"
@@ -185,7 +178,7 @@ function PublishPost() {
                   label={
                     <Space size="small">
                       Add a title image
-                      <Popover content="This field is optional" trigger="hover">
+                      <Popover content="optional" trigger="hover">
                         <InfoCircleOutlined
                           style={{
                             color: token.colorPrimary,

@@ -22,7 +22,7 @@ function AntdSpin() {
   };
   return (
     <Layout style={layoutStyle}>
-      <Spin style={contentStyle} size="large"></Spin>
+      <Spin className="icon-spin" style={contentStyle} size="large"></Spin>
     </Layout>
   );
 }

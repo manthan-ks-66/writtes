@@ -62,8 +62,8 @@ const GoogleBtn = () => {
       }
     },
     flow: "auth-code",
-    onError: (error) =>
-      notify.api.error({ title: error.message, placement: "top" }),
+    onError: () =>
+      notify.api.error({ title: "Failed to Sign in", placement: "top" }),
   });
 
   return (

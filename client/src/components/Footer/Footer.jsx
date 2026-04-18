@@ -1,9 +1,9 @@
 import { Layout, Row, Col, Typography, Space, Divider, theme } from "antd";
 import {
   GithubOutlined,
-  TwitterOutlined,
   LinkedinOutlined,
   GlobalOutlined,
+  XOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import Logo from "../Logo/Logo.jsx";
@@ -66,22 +66,27 @@ function AppFooter() {
               Connect
             </Title>
             <Space size="middle" style={{ fontSize: "18px" }}>
-              <TwitterOutlined
-                className="footer-icon"
-                style={{ cursor: "pointer" }}
-              />
-              <GithubOutlined
-                className="footer-icon"
-                style={{ cursor: "pointer" }}
-              />
-              <LinkedinOutlined
-                className="footer-icon"
-                style={{ cursor: "pointer" }}
-              />
-              <GlobalOutlined
-                className="footer-icon"
-                style={{ cursor: "pointer" }}
-              />
+              <a href="https://x.com/manthan_ks" target="_blank">
+                <XOutlined
+                  className="footer-icon"
+                  style={{ cursor: "pointer" }}
+                />
+              </a>
+              <a href="https://github.com/manthan-ks-66" target="_blank">
+                <GithubOutlined
+                  className="footer-icon"
+                  style={{ cursor: "pointer" }}
+                />
+              </a>
+              <a
+                href="https://linkedin.com/in/manthan-srivastav-644a8927b"
+                target="_blank"
+              >
+                <LinkedinOutlined
+                  className="footer-icon"
+                  style={{ cursor: "pointer" }}
+                />
+              </a>
             </Space>
           </Col>
         </Row>
@@ -93,7 +98,8 @@ function AppFooter() {
         <Row justify="space-between" align="middle">
           <Col>
             <Text style={{ fontSize: "11px", color: "#4B5563" }}>
-              © {new Date().getFullYear()} Postly Inc. All rights reserved.
+              <b>&copy;</b> {new Date().getFullYear()} <b>WRITTES</b> All rights
+              reserved.
             </Text>
           </Col>
           <Col>

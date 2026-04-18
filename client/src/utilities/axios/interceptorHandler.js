@@ -1,7 +1,5 @@
-// Handles refresh accessToken endpoint for 401 Session expired error
-import { userInstance } from "./axiosInstances";
-import handleError from "../services/errorHandler";
 import axios from "axios";
+import handleError from "./errorHandler.js";
 
 const usersBaseUrl = import.meta.env.VITE_USERS_API_BASE_URL;
 let isRefreshing = false;
@@ -14,10 +12,10 @@ const processQueue = (error, token = null) => {
   });
 };
 
+// Handles response and error as well as refresh accessToken endpoint for 401 Token expired error
 const handleAxiosInterceptor = (axiosInstance) => {
   axiosInstance.interceptors.response.use(
     async (response) => {
-      console.log("interceptor handler is working");
       return response;
     },
     async (error) => {
@@ -26,18 +24,21 @@ const handleAxiosInterceptor = (axiosInstance) => {
       const errMsg = error?.response?.data?.message;
 
       if (
+        errMsg === "Id Expired" &&
         errStatusCode === 401 &&
-        errMsg === "Session Expired" &&
         !originalRequest._retry
       ) {
-        // if 2nd or more reqs comes after the first original req which got the 401 unauthorized error
-        // add those reqs to waiting queue []
+        /* if 2nd or more reqs comes after the first original req which got the 401 unauthorized error
+         * add those reqs to waiting queue []
+         * The .then() will process the reqs again when the promises get resolved from the processQueue()
+         */
         if (isRefreshing) {
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
-          }).then(() => userInstance(originalRequest));
+          }).then(() => axiosInstance(originalRequest));
         }
 
+        // The _retry flag prevents the infinite request retry loop
         isRefreshing = true;
         originalRequest._retry = true;
 
@@ -49,6 +50,7 @@ const handleAxiosInterceptor = (axiosInstance) => {
               withCredentials: true,
             },
           );
+
           if (res.status === 200) {
             processQueue(null);
             return axiosInstance(originalRequest);

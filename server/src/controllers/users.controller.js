@@ -7,7 +7,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { uploadToImageKit, deleteImageKitFile } from "../utils/imagekit.js";
 import asyncHandler from "../utils/asyncHandler.js";
-import returnHTML from "../utils/returnMailHtml.js";
+import returnCodeMail from "../utils/returnCodeMail.js";
 
 // module imports
 import jwt from "jsonwebtoken";
@@ -17,7 +17,7 @@ import { OAuth2Client } from "google-auth-library";
 import { Resend } from "resend";
 
 // Methods and configs:
-// Resend config
+// Resend Email config
 const resend = new Resend(process.env.RESEND_VERIFICATION_MAIL_API_KEY);
 
 // http cookie options
@@ -28,17 +28,17 @@ const options = {
 };
 
 // user OTP generator method
-const generateAndSendOTP = async (processMsg, user, email, subject) => {
-  const otp = randomInt(100000, 999999);
+const generateAndMailPassCode = async (processMsg, user, email, subject) => {
+  const serverPassCode = randomInt(100000, 999999);
 
-  await user.hashOTP(otp);
+  await user.hashPassCode(serverPassCode);
   await user.save();
 
   const firstName = user.fullName.trim().split(" ")[0];
-  const mailHTML = returnHTML(processMsg, firstName, email, subject, otp);
+  const mailHTML = returnCodeMail(processMsg, firstName, email, subject, otp);
 
   await resend.emails.send({
-    from: "PROSE <noreply@verify.onprose.tech>",
+    from: "WRITTES <authentication@verify.writtes.com>",
     to: email,
     subject: subject,
     html: mailHTML,
@@ -104,7 +104,7 @@ const registerUser = asyncHandler(async (req, res) => {
       lifeTime: Date.now(),
     });
 
-    await generateAndSendOTP(
+    await generateAndMailPassCode(
       "registration process",
       existedUser,
       email,
@@ -135,7 +135,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "User registration failed");
   }
 
-  await generateAndSendOTP(
+  await generateAndMailPassCode(
     "registration process",
     user,
     email,
@@ -147,12 +147,7 @@ const registerUser = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .cookie("verificationToken", verificationToken, options)
-    .json(
-      new ApiResponse(
-        201,
-        "User registered and OTP has been sent successfully",
-      ),
-    );
+    .json(new ApiResponse(201, "User registered and OTP  sent successfully"));
 });
 
 const regenerateRegistrationOTP = asyncHandler(async (req, res) => {
@@ -160,7 +155,7 @@ const regenerateRegistrationOTP = asyncHandler(async (req, res) => {
   let decodedToken;
 
   if (!verificationToken) {
-    throw new ApiError(400, "Invalid token: User is not registered");
+    throw new ApiError(400, "User is not registered");
   }
 
   try {
@@ -198,7 +193,7 @@ const regenerateRegistrationOTP = asyncHandler(async (req, res) => {
 
 const verifyAndLoginUser = asyncHandler(async (req, res) => {
   /**
-   * get verificationToken, otp from req
+   * get verificationToken & otp from req
    * decode the token and check the token expiry
    * find the user from the decoded token
    * check if otp is expired
@@ -214,7 +209,7 @@ const verifyAndLoginUser = asyncHandler(async (req, res) => {
   let decodedToken;
 
   if (!verificationToken) {
-    throw new ApiError(400, "Invalid token: User is not registered");
+    throw new ApiError(400, "User is not registered");
   }
 
   try {
@@ -223,7 +218,11 @@ const verifyAndLoginUser = asyncHandler(async (req, res) => {
       process.env.VERIFICATION_TOKEN_SECRET,
     );
   } catch (error) {
-    throw new ApiError(400, "Session Expired - Register again");
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new ApiError(400, "Session Expired");
+    }
+
+    throw new ApiError(400, "Invalid token");
   }
 
   const userAccount = await User.findOne({ _id: decodedToken._id });
@@ -238,12 +237,13 @@ const verifyAndLoginUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "OTP is expired! Register Again");
   }
 
-  const isOTPCorrect = await userAccount.isOtpCorrect(otp);
+  const isOTPCorrect = await userAccount.isPassCodeCorrect(otp);
 
   if (!isOTPCorrect) {
     throw new ApiError(400, "Invalid OTP");
   }
 
+  // the $unset operator removes the fields from the collection
   const user = await User.findOneAndUpdate(
     { _id: userId },
     {
@@ -289,7 +289,7 @@ const authenticateWithGoogle = asyncHandler(async (req, res) => {
   const { tokens } = await client.getToken(code);
   const idToken = tokens.id_token;
 
-  const ticket = await client.verifyIdToken({
+  const ticket = client.verifyIdToken({
     idToken,
     audience: process.env.GOOGLE_AUTH_CLIENT_ID,
   });
@@ -302,7 +302,7 @@ const authenticateWithGoogle = asyncHandler(async (req, res) => {
   let user = await User.findOne({ googleId: sub });
 
   if (user) {
-    // in case if user has updated the email at google
+    // in case if user has updated the email or name at google
     if (user.email !== email || user.fullName !== name) {
       user.fullName = name;
       user.email = email;
@@ -310,12 +310,13 @@ const authenticateWithGoogle = asyncHandler(async (req, res) => {
     }
   } else {
     /**
-     * Priority 2 - find the user by email (in case user is registered locally)
+     * Priority 2 - find the user by email (in case user is registered locally & attempt to login with google)
   
-     * this else case will only run when user from the googleId is not found - then find the user by email
-     * if the user from the email is still not found then create user to proceed further for login
+     * this else case will only run when user from the googleId is not found - then find the local user by email
+     * if local user is exist add the googleId and proceed to generate user tokens
+     * if the user from the email is still not found then create the user and proceed further for login
 
-     * - if user by googleId is found the logic proceeds to generate user tokens (login)
+     * - if user by googleId is found - the logic proceeds to generate user tokens
      */
     user = await User.findOne({ email });
 
@@ -548,12 +549,7 @@ const handleResetPasswordOTP = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User with this email is not registered");
   }
 
-  const otp = randomInt(100000, 999999);
-
-  await user.hashOTP(otp);
-  await user.save();
-
-  await generateAndSendOTP(
+  await generateAndMailPassCode(
     "password reset process",
     user,
     email,
@@ -599,10 +595,7 @@ const resetUserPassword = asyncHandler(async (req, res) => {
   }
 
   if (!verificationToken) {
-    throw new ApiError(
-      400,
-      "Invalid request - User has not requested for password update",
-    );
+    throw new ApiError(400, "You have not requested for password reset");
   }
 
   try {
@@ -618,19 +611,21 @@ const resetUserPassword = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid token");
   }
 
-  const user = await User.findOne({ _id: decodedToken._id });
+  const user = await User.findOne({ _id: decodedToken._id }).select(
+    "+password +passcode +passcodeExpiry",
+  );
 
   if (!user) {
     throw new ApiError(400, "User is not registered");
   }
 
-  if (Date.now() > user.otpExpiry) {
+  if (Date.now() > user.passcodeExpiry) {
     throw new ApiError(400, "OTP Expired");
   }
 
-  const isOTPValid = user.isOtpCorrect(otp);
+  const isOTPCorrect = user.isPassCodeCorrect(otp);
 
-  if (!isOTPValid) {
+  if (!isOTPCorrect) {
     throw new ApiError(400, "Invalid OTP");
   }
 
@@ -641,8 +636,8 @@ const resetUserPassword = asyncHandler(async (req, res) => {
         password: newPassword,
       },
       $unset: {
-        OTP: true,
-        otpExpiry: true,
+        passcode: true,
+        passcodeExpiry: true,
       },
     },
     { new: true },
@@ -671,13 +666,18 @@ const updateUserDetails = asyncHandler(async (req, res) => {
     userId,
     {
       $set: {
-        bio,
         fullName,
         about,
-        x,
-        linkedIn,
-        instagram,
-        github,
+        profile: {
+          bio,
+          about,
+        },
+        socialLinks: {
+          instagram,
+          linkedIn,
+          github,
+          x,
+        },
       },
     },
     {
@@ -708,7 +708,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     decodedToken = jwt.verify(incomingToken, process.env.REFRESH_TOKEN_SECRET);
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      throw new ApiError(400, "Session Expired - Please login");
+      throw new ApiError(401, "Session Expired");
     }
 
     throw new ApiError(400, "Invalid Token");
@@ -837,13 +837,9 @@ const fetchAuthor = asyncHandler(async (req, res) => {
       _id: 0,
       fullName: 1,
       avatar: 1,
-      bio: 1,
-      about: 1,
+      profile: 1,
       username: 1,
-      x: 1,
-      instagram: 1,
-      github: 1,
-      linkedIn: 1,
+      socialLinks: 1,
     },
   );
 

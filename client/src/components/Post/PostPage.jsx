@@ -28,10 +28,10 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNotify } from "../../context/NotificationProvider.jsx";
-import { useNavigate } from "react-router-dom";
 
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
+const { TextArea } = Input;
 
 function PostPage() {
   const user = useSelector((state) => state.auth.user);
@@ -40,7 +40,6 @@ function PostPage() {
   const notify = useNotify();
 
   const [open, setOpen] = useState(false);
-
   const [post, setPost] = useState(null);
   const [error, setError] = useState("");
   const [loader, setLoader] = useState(true);
@@ -50,7 +49,18 @@ function PostPage() {
 
   const { _id, slug } = useParams();
 
-  const navigate = useNavigate();
+  const data = {
+    comments: [
+      {
+        id: 1,
+        body: "This is good",
+      },
+      {
+        id: 2,
+        body: "This is good",
+      },
+    ],
+  };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -61,19 +71,19 @@ function PostPage() {
     });
   };
 
-  const fetchPost = async () => {
-    try {
-      const resPost = await postService.fetchPost(_id);
-
-      setPost(resPost);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoader(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const resPost = await postService.fetchPost(_id);
+
+        setPost(resPost);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoader(false);
+      }
+    };
+
     fetchPost();
   }, [_id, slug]);
 
@@ -130,9 +140,7 @@ function PostPage() {
               </Space>
             </Flex>
           )}
-
           {error && <Text type="danger">{error}</Text>}
-
           {/* Featured Image */}
           <div className="featured-image-wrapper">
             <Image
@@ -141,12 +149,10 @@ function PostPage() {
               src={post?.featuredImage}
             />
           </div>
-
           {/* Post Header */}
           <Title level={2} className="post-title">
             {post?.title}
           </Title>
-
           {/* Metadata Bar */}
           <Flex
             wrap="wrap"
@@ -210,7 +216,6 @@ function PostPage() {
               )}
             </Flex>
           </Flex>
-
           {/* Interaction Bar */}
           <Flex
             gap="14px"
@@ -267,7 +272,6 @@ function PostPage() {
               />
             </Modal>
           </Flex>
-
           {/* Main Content */}
           <Paragraph
             className="post-body"
@@ -277,6 +281,56 @@ function PostPage() {
           >
             {post?.content}
           </Paragraph>
+
+          <div className="comments-section">
+            <h2
+              style={{
+                margin: "10px 0",
+              }}
+              className="comment"
+            >
+              Comments
+            </h2>
+            <Flex
+              style={{ alignItems: "center" }}
+              align="flex-start"
+              gap="12px"
+              className="comment-composer"
+            >
+              <Avatar
+                size="large"
+                src={user?.avatar?.url}
+                icon={<UserOutlined />}
+              />
+              <Input
+                size="middle"
+                className="comment-input"
+                placeholder="Write a comment..."
+              />
+              <Button type="primary">Add</Button>
+            </Flex>
+            <Space vertical size="middle" className="comments-list">
+              {data.comments.map((comment) => (
+                <div key={comment.id} className="comment-item">
+                  <Avatar size="middle" icon={<UserOutlined />} />
+                  <div className="comment-bubble">
+                    <Text
+                      strong
+                      style={{ fontSize: "13px", display: "block" }}
+                    ></Text>
+                    <Text
+                      style={{
+                        fontSize: "13px",
+                        color: token.colorTextSecondary,
+                      }}
+                    >
+                      {comment.body}
+                    </Text>
+                  </div>
+                </div>
+              ))}
+            </Space>
+          </div>
         </Content>
       ) : (
         <div

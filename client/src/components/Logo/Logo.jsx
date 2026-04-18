@@ -5,7 +5,11 @@ function Logo() {
     <>
       <div className="logo-container">
         <div className="logo">
-          <img width={200} height={105} src="/logo.png" alt="logo" />
+          <img
+            className="logo-img"
+            src="/FullLogo_Transparent.png"
+            alt="logo"
+          />
         </div>
       </div>
     </>

@@ -1,5 +1,6 @@
 // react imports
 import { createRoot } from "react-dom/client";
+import { Navigate } from "react-router-dom";
 import "./index.css";
 
 // state management providers
@@ -12,38 +13,39 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // Root components
 import App from "./App.jsx";
-import DashBoard from "./DashBoard.jsx";
+import Dashboard from "./Dashboard.jsx";
 
 // auth components (under protected routes - /auth)
 import Register from "./components/Auth/Register.jsx";
 import Login from "./components/Auth/Login.jsx";
-import ResetPassword from "./components/Auth/ResetPassword.jsx";
-import OtpVerification from "./components/Auth/OtpVerification.jsx";
+import ResetPasswordInput from "./components/Auth/ResetPasswordInput.jsx";
+import RegistrationOtpInput from "./components/Auth/RegistrationOtpInput.jsx";
 import VerifyIdentity from "./components/Auth/VerifyIdentity.jsx";
 
-// general components (un-protected)
-import Home from "./components/Home.jsx";
-import About from "./components/About.jsx";
-import NotFound from "./components/NotFound.jsx";
+// general components - Public access
+import Home from "./components/Generals/Home.jsx";
+import About from "./components/Generals/About.jsx";
+import NotFound from "./components/Generals/NotFound.jsx";
 
-// Protection Container 
-import AuthLayout from "./components/AuthLayout.jsx";
+// Routes Guard
+import AuthLayout from "./components/Guard/AuthLayout.jsx";
 
-// Post components
+// Post components - Public access
 import PostPage from "./components/Post/PostPage.jsx";
 import Explore from "./components/Post/Explore.jsx";
 import QueryPosts from "./components/Post/QueryPosts.jsx";
 import Author from "./components/Post/Author.jsx";
 
-// Protected publish post component
+// Protected post components
 import PublishPost from "./components/Post/PublishPost.jsx";
 
 // Users components (under protected routes - /user)
-import UserSider from "./components/User/UserSider.jsx";
-import Settings from "./components/Auth/Settings.jsx";
+import UserTabs from "./components/User/UserTabs.jsx";
+import Settings from "./components/User/Settings.jsx";
 import UserProfile from "./components/User/UserProfile.jsx";
 import UserComments from "./components/User/UserComments.jsx";
 import UserLikedPosts from "./components/User/UserLikedPosts.jsx";
+import UserWrites from "./components/User/UserWrites.jsx";
 
 const postlyDarkTheme = {
   algorithm: antdTheme.darkAlgorithm,
@@ -92,7 +94,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <DashBoard />,
+        element: <Dashboard />,
         children: [
           {
             path: "/",
@@ -107,7 +109,7 @@ const router = createBrowserRouter([
             element: <PostPage />,
           },
           {
-            path: "/explore-posts",
+            path: "/explore",
             element: <Explore />,
           },
           {
@@ -127,15 +129,20 @@ const router = createBrowserRouter([
             element: <Author />,
           },
           {
-            path: "/user",
+            path: "account",
+            index: <UserProfile />,
             element: (
               <AuthLayout>
-                <UserSider />
+                <UserTabs />
               </AuthLayout>
             ),
             children: [
               {
-                path: "/user/:username",
+                index: true,
+                element: <Navigate to="manage-profile" replace />,
+              },
+              {
+                path: "manage-profile",
                 element: (
                   <AuthLayout>
                     <UserProfile />
@@ -143,7 +150,7 @@ const router = createBrowserRouter([
                 ),
               },
               {
-                path: "/user/comments",
+                path: "comments",
                 element: (
                   <AuthLayout>
                     <UserComments />
@@ -151,10 +158,26 @@ const router = createBrowserRouter([
                 ),
               },
               {
-                path: "/user/liked-posts",
+                path: "liked-posts",
                 element: (
                   <AuthLayout>
                     <UserLikedPosts />
+                  </AuthLayout>
+                ),
+              },
+              {
+                path: "your-writes",
+                element: (
+                  <AuthLayout>
+                    <UserWrites />
+                  </AuthLayout>
+                ),
+              },
+              {
+                path: "settings",
+                element: (
+                  <AuthLayout>
+                    <Settings />
                   </AuthLayout>
                 ),
               },
@@ -165,14 +188,6 @@ const router = createBrowserRouter([
             element: (
               <AuthLayout>
                 <PublishPost />
-              </AuthLayout>
-            ),
-          },
-          {
-            path: "/settings",
-            element: (
-              <AuthLayout>
-                <Settings />
               </AuthLayout>
             ),
           },
@@ -190,7 +205,7 @@ const router = createBrowserRouter([
         path: "/auth/register/verify",
         element: (
           <AuthLayout>
-            <OtpVerification />
+            <RegistrationOtpInput />
           </AuthLayout>
         ),
       },
@@ -218,7 +233,7 @@ const router = createBrowserRouter([
         path: "/auth/forgot-password/reset/verify",
         element: (
           <AuthLayout>
-            <ResetPassword />,
+            <ResetPasswordInput />,
           </AuthLayout>
         ),
       },

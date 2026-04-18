@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Controller, useForm } from "react-hook-form";
+
 import {
   Avatar,
   Flex,
@@ -8,11 +11,11 @@ import {
   Space,
   Row,
   Col,
-  Grid,
   theme,
   Upload,
+  Modal,
 } from "antd";
-import { useSelector } from "react-redux";
+
 import {
   EditOutlined,
   SaveOutlined,
@@ -24,79 +27,95 @@ import {
   LinkedinOutlined,
   InstagramOutlined,
 } from "@ant-design/icons";
+
+import { useNotify } from "../../context/NotificationProvider.jsx";
 import userService from "../../services/userService";
 import { update } from "../../store/authSlice.js";
-import { useDispatch } from "react-redux";
-import { useNotify } from "../../context/NotificationProvider.jsx";
-
-import { Controller, useForm } from "react-hook-form";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
-const { useBreakpoint } = Grid;
+
+const socialConfig = [
+  {
+    key: "x",
+    label: "X",
+    icon: <XOutlined style={{ color: "currentColor", fontSize: 16 }} />,
+    color: "inherit",
+  },
+  {
+    key: "github",
+    label: "GitHub",
+    icon: <GithubOutlined style={{ color: "currentColor", fontSize: 16 }} />,
+    color: "inherit",
+  },
+  {
+    key: "linkedIn",
+    label: "LinkedIn",
+    icon: <LinkedinOutlined style={{ color: "#0077b5", fontSize: 16 }} />,
+    color: "#0077b5",
+  },
+  {
+    key: "instagram",
+    label: "Instagram",
+    icon: <InstagramOutlined style={{ color: "#c13584", fontSize: 16 }} />,
+    color: "#c13584",
+  },
+];
 
 function UserProfile() {
   const user = useSelector((state) => state.auth.user);
-
-  const screens = useBreakpoint();
   const { token } = theme.useToken();
-
   const dispatch = useDispatch();
   const notify = useNotify();
 
   const { handleSubmit, control } = useForm({
     defaultValues: {
-      bio: user?.bio || "",
-      about: user?.about || "",
       fullName: user?.fullName || "",
-      x: user?.x || "",
-      github: user?.github || "",
-      linkedin: user?.linkedin || "",
-      instagram: user?.instagram || "",
+      bio: user?.profile?.bio || "",
+      about: user?.profile?.about || "",
+      x: user?.socialLinks?.x || "",
+      github: user?.socialLinks?.github || "",
+      linkedIn: user?.socialLinks?.linkedIn || "",
+      instagram: user?.socialLinks?.instagram || "",
     },
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
 
-  const containerPadding = screens.xs ? "12px" : screens.sm ? "16px" : "24px";
-  const sectionPadding = screens.xs ? "12px" : screens.sm ? "20px" : "32px";
-  const avatarSize = screens.xs
-    ? 80
-    : screens.sm
-      ? 100
-      : screens.md
-        ? 120
-        : 140;
-  const titleLevel = screens.xs ? 3 : screens.sm ? 2 : 1;
-  const subtextSize = screens.xs ? "12px" : screens.sm ? "14px" : "16px";
-  const textSize = screens.xs ? "14px" : screens.sm ? "15px" : "16px";
+  const sectionTitleStyle = {
+    display: "block",
+    marginBottom: 8,
+    color: token.colorTextSecondary,
+    letterSpacing: "0.4px",
+  };
 
-  const socialLinks = [
-    {
-      key: "x",
-      label: "X",
-      icon: <XOutlined style={{ color: token.colorTextBase }} />,
-      value: user?.x || "",
-    },
-    {
-      key: "github",
-      label: "GitHub",
-      icon: <GithubOutlined style={{ color: token.colorTextBase }} />,
-      value: user?.github || "",
-    },
-    {
-      key: "linkedIn",
-      label: "LinkedIn",
-      icon: <LinkedinOutlined style={{ color: "#0077b5" }} />,
-      value: user?.linkedIn || "",
-    },
-    {
-      key: "instagram",
-      label: "Instagram",
-      icon: <InstagramOutlined style={{ color: "#c13584" }} />,
-      value: user?.instagram || "",
-    },
-  ];
+  const textStyle = {
+    marginTop: 0,
+    marginBottom: 0,
+    color: token.colorTextBase,
+    fontSize: 14,
+  };
+
+  const inputStyle = {
+    fontSize: 14,
+    borderRadius: token.borderRadiusLG,
+  };
+
+  const renderTextField = (name, placeholder) => (
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <Input
+          {...field}
+          size="middle"
+          placeholder={placeholder}
+          style={inputStyle}
+        />
+      )}
+    />
+  );
 
   const handleAvatarUpdate = async ({ file }) => {
     try {
@@ -107,14 +126,11 @@ function UserProfile() {
       });
 
       const formData = new FormData();
-
       if (file) formData.append("avatar", file);
 
-      const user = await userService.updateUserAvatar(formData);
-
-      if (user) {
-        dispatch(update(user));
-
+      const updatedUser = await userService.updateUserAvatar(formData);
+      if (updatedUser) {
+        dispatch(update(updatedUser));
         notify.api.success({
           title: "Avatar Updated Successfully",
           placement: "top",
@@ -129,19 +145,29 @@ function UserProfile() {
     }
   };
 
+  const handleNotifyRemove = () => {
+    if (!user?.avatar) {
+      notify.api.error({
+        title: "You have not added avatar picture",
+        placement: "top",
+      });
+      return;
+    }
+
+    setIsRemoveModalOpen(true);
+  };
+
   const handleRemoveAvatar = async () => {
     try {
+      setIsRemoveModalOpen(false);
       const res = await userService.removeUserAvatar();
 
       if (res.status === 200) {
+        dispatch(update(res.data?.data));
         notify.api.success({
           title: "Avatar removed successfully",
           placement: "top",
         });
-
-        const user = res.data?.data;
-
-        dispatch(update(user));
       }
     } catch (error) {
       notify.api.error({
@@ -152,57 +178,54 @@ function UserProfile() {
   };
 
   const handleUserDataUpdate = async (userData) => {
+    if (!userData.fullName) {
+      notify.api.error({
+        title: "Name cannot be emtpy",
+        placement: "top",
+      });
+
+      return;
+    }
+
     try {
-      const user = await userService.updateUserDetails(userData);
-
-      if (user) {
-        dispatch(update(user));
-
+      const updatedUser = await userService.updateUserDetails(userData);
+      if (updatedUser) {
+        dispatch(update(updatedUser));
         notify.api.success({
-          title: "Details updated successfully",
+          title: "Details updated",
           placement: "top",
         });
-
-        setIsEditing(false);
       }
     } catch (error) {
       notify.api.error({
         title: error.message,
         placement: "top",
       });
+    } finally {
+      setIsEditing(false);
     }
   };
+
+  const socialLinks = socialConfig.map((item) => ({
+    ...item,
+    value: user?.socialLinks?.[item.key] || "",
+  }));
 
   return (
     <div
       style={{
-        maxWidth: 1000,
+        maxWidth: 1200,
         margin: "0 auto",
         width: "100%",
-        padding: containerPadding,
+        padding: "8px 4px 18px",
       }}
     >
-      {/* Top Profile Section */}
-      <Row
-        gutter={[
-          screens.xs ? 12 : screens.sm ? 16 : 24,
-          screens.xs ? 12 : screens.sm ? 16 : 24,
-        ]}
-        align="middle"
-        justify={screens.xs ? "center" : "start"}
-      >
-        {/* Avatar Column */}
-        <Col
-          xs={24}
-          sm={6}
-          md={5}
-          lg={4}
-          style={{ textAlign: "center", flexShrink: 0 }}
-        >
+      <Row gutter={[16, 16]} align="middle">
+        <Col xs={24} sm={6} md={5} lg={4} style={{ textAlign: "center" }}>
           <Avatar
             src={user?.avatar?.url}
             icon={<UserOutlined />}
-            size={avatarSize}
+            size={110}
             style={{
               border: `3px solid ${token.colorPrimary}`,
               display: "flex",
@@ -213,21 +236,8 @@ function UserProfile() {
           />
         </Col>
 
-        {/* Buttons, Name & Username Column */}
-        <Col
-          xs={24}
-          sm={18}
-          md={19}
-          lg={20}
-          style={{ textAlign: screens.xs ? "center" : "left" }}
-        >
-          {/* Update & Remove Buttons */}
-          <Flex
-            gap={8}
-            justify={screens.xs ? "center" : "flex-start"}
-            wrap="wrap"
-            style={{ marginBottom: 16 }}
-          >
+        <Col xs={24} sm={18} md={19} lg={20}>
+          <Flex gap={8} wrap="wrap" style={{ marginBottom: 12 }}>
             <Upload
               accept="jpeg, jpg, image/jpeg, image/jpg"
               customRequest={handleAvatarUpdate}
@@ -242,8 +252,9 @@ function UserProfile() {
                 Update
               </Button>
             </Upload>
+
             <Button
-              onClick={handleRemoveAvatar}
+              onClick={handleNotifyRemove}
               size="small"
               danger
               icon={<DeleteOutlined />}
@@ -251,22 +262,30 @@ function UserProfile() {
             >
               Remove
             </Button>
+
+            <Modal
+              title="Confirm Remove"
+              okText="Yes"
+              open={isRemoveModalOpen}
+              onOk={handleRemoveAvatar}
+              onCancel={() => setIsRemoveModalOpen(false)}
+            >
+              <Text type="primary">
+                Are you sure you want to delete the avatar ?
+              </Text>
+            </Modal>
           </Flex>
 
-          {/* Name & Username */}
           <Title
-            level={titleLevel}
-            style={{
-              margin: "0 0 4px 0",
-              color: token.colorTextBase,
-            }}
+            level={3}
+            style={{ margin: "0 0 4px 0", color: token.colorTextBase }}
           >
             {user?.fullName}
           </Title>
           <Text
             type="secondary"
             style={{
-              fontSize: subtextSize,
+              fontSize: 13,
               color: token.colorTextSecondary,
               display: "block",
             }}
@@ -276,10 +295,7 @@ function UserProfile() {
         </Col>
       </Row>
 
-      <Flex
-        justify="flex-end"
-        style={{ marginBottom: screens.xs ? "12px" : "16px" }}
-      >
+      <Flex justify="flex-end" style={{ marginBottom: 12, marginTop: 14 }}>
         <Button
           type={isEditing ? "primary" : "default"}
           icon={isEditing ? <SaveOutlined /> : <EditOutlined />}
@@ -289,122 +305,43 @@ function UserProfile() {
               : () => setIsEditing(true)
           }
           size="small"
-          style={{
-            padding: "10px 14px",
-            fontSize: screens.xs ? "12px" : "14px",
-            borderRadius: "6px",
-          }}
+          style={{ padding: "10px 14px", fontSize: 13, borderRadius: "6px" }}
         >
           {isEditing ? "Save" : "Edit"}
         </Button>
       </Flex>
 
-      {/* Content Box */}
       <div
         style={{
-          padding: sectionPadding,
-          borderRadius: token.borderRadiusLG,
-          background: token.colorBgCard,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          padding: 20,
+          background: token.colorBgBlur,
         }}
       >
-        <Space vertical size="large" style={{ width: "100%" }}>
+        <Space vertical size="middle" style={{ width: "100%" }}>
           <section>
-            <Title
-              level={5}
-              style={{
-                display: "block",
-                marginBottom: 8,
-                color: token.colorTextSecondary,
-                letterSpacing: "0.5px",
-              }}
-            >
+            <Title level={5} style={sectionTitleStyle}>
               Full Name
             </Title>
             {isEditing ? (
-              <Controller
-                name="fullName"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    size={screens.xs ? "middle" : "large"}
-                    style={{
-                      fontSize: textSize,
-                      borderRadius: token.borderRadiusLG,
-                    }}
-                  />
-                )}
-              />
+              renderTextField("fullName")
             ) : (
-              <Text
-                style={{
-                  marginTop: 0,
-                  marginBottom: 0,
-                  color: token.colorTextBase,
-                  fontSize: textSize,
-                }}
-                value={user?.fullName}
-              >
-                {user?.fullName}
-              </Text>
+              <Text style={textStyle}>{user?.fullName}</Text>
             )}
           </section>
 
-          {/* Bio Section */}
           <section>
-            <Title
-              level={5}
-              style={{
-                display: "block",
-                marginBottom: 8,
-                color: token.colorTextSecondary,
-                letterSpacing: "0.5px",
-              }}
-            >
+            <Title level={5} style={sectionTitleStyle}>
               Bio
             </Title>
             {isEditing ? (
-              <Controller
-                name="bio"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    size={screens.xs ? "middle" : "large"}
-                    placeholder="Write a catchy bio..."
-                    style={{
-                      fontSize: textSize,
-                      borderRadius: token.borderRadiusLG,
-                    }}
-                  />
-                )}
-              />
+              renderTextField("bio", "Write a catchy bio...")
             ) : (
-              <Text
-                style={{
-                  marginTop: 0,
-                  marginBottom: 0,
-                  color: token.colorTextBase,
-                  fontSize: textSize,
-                }}
-              >
-                {user?.bio}
-              </Text>
+              <Text style={textStyle}>{user?.profile?.bio}</Text>
             )}
           </section>
 
-          {/* About Section */}
           <section>
-            <Title
-              level={5}
-              style={{
-                display: "block",
-                marginBottom: 8,
-                color: token.colorTextSecondary,
-                letterSpacing: "0.5px",
-              }}
-            >
+            <Title level={5} style={sectionTitleStyle}>
               About
             </Title>
             {isEditing ? (
@@ -414,47 +351,25 @@ function UserProfile() {
                 render={({ field }) => (
                   <TextArea
                     {...field}
-                    rows={screens.xs ? 3 : screens.sm ? 3 : 4}
+                    rows={3}
                     placeholder="Tell us about yourself..."
-                    style={{
-                      fontSize: textSize,
-                      borderRadius: token.borderRadiusLG,
-                      lineHeight: "1.6",
-                    }}
+                    style={{ ...inputStyle, lineHeight: "1.6" }}
                   />
                 )}
               />
             ) : (
-              <Text
-                style={{
-                  marginTop: 0,
-                  marginBottom: 0,
-                  color: token.colorTextBase,
-                  fontSize: textSize,
-                }}
-              >
-                {user?.about}
-              </Text>
+              <Text style={textStyle}>{user?.profile?.about}</Text>
             )}
           </section>
 
-          {/* Social Links Section */}
           <section>
-            <Title
-              level={5}
-              style={{
-                display: "block",
-                marginBottom: 8,
-                color: token.colorTextSecondary,
-                letterSpacing: "0.5px",
-              }}
-            >
+            <Title level={5} style={sectionTitleStyle}>
               Social Links
             </Title>
 
             {isEditing ? (
               <Row gutter={[12, 12]}>
-                {socialLinks.map((item) => (
+                {socialConfig.map((item) => (
                   <Col xs={24} sm={12} key={item.key}>
                     <Controller
                       name={item.key}
@@ -463,12 +378,9 @@ function UserProfile() {
                         <Input
                           {...field}
                           prefix={item.icon}
-                          size={screens.xs ? "middle" : "large"}
-                          placeholder={item.placeholder}
-                          style={{
-                            fontSize: textSize,
-                            borderRadius: token.borderRadiusLG,
-                          }}
+                          size="middle"
+                          placeholder={`Add ${item.label} URL`}
+                          style={inputStyle}
                         />
                       )}
                     />
@@ -476,11 +388,7 @@ function UserProfile() {
                 ))}
               </Row>
             ) : (
-              <Space
-                size={screens.xs ? "middle" : "large"}
-                wrap
-                style={{ fontSize: screens.xs ? "22px" : "24px" }}
-              >
+              <Space size="middle" wrap style={{ fontSize: 18 }}>
                 {socialLinks.map((item) => {
                   if (!item.value) return null;
 
@@ -495,13 +403,14 @@ function UserProfile() {
                         display: "inline-flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        color: "inherit",
+                        color: item.color,
                       }}
                     >
                       {item.icon}
                     </a>
                   );
                 })}
+
                 {!socialLinks.some((item) => item.value) ? (
                   <Text type="secondary">No social links added</Text>
                 ) : null}

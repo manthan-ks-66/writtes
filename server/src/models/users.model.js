@@ -52,43 +52,45 @@ const userSchema = new mongoose.Schema(
       enum: ["local", "google"],
     },
 
-    // user information fields
-    bio: {
-      type: String,
-      default: "",
-    },
-    about: {
-      type: String,
-      default: "",
+    // user profile fields
+    profile: {
+      bio: {
+        type: String,
+        default: "",
+      },
+      about: {
+        type: String,
+        default: "",
+      },
     },
 
     // user social link fields
-    instagram: {
-      type: String,
-      default: "",
-    },
-    linkedIn: {
-      type: String,
-      default: "",
-    },
-    x: {
-      type: String,
-      default: "",
-    },
-    github: {
-      type: String,
-      default: "",
+    socialLinks: {
+      instagram: {
+        type: String,
+        default: "",
+      },
+      linkedIn: {
+        type: String,
+        default: "",
+      },
+      x: {
+        type: String,
+        default: "",
+      },
+      github: {
+        type: String,
+        default: "",
+      },
     },
 
-    // temporary fields for verification
-    OTP: {
+    // temp fields for user verification
+    passcode: {
       type: String,
-      default: undefined,
       select: false,
     },
-    otpExpiry: {
+    passcodeExpiry: {
       type: Date,
-      default: undefined,
       select: false,
     },
     lifeTime: {
@@ -106,6 +108,9 @@ userSchema.set("toJSON", {
   transform: (_, ret) => {
     delete ret.password;
     delete ret.refreshToken;
+    delete ret.OTP;
+    delete ret.otpExpiry;
+    delete ret.lifeTime;
 
     return ret;
   },
@@ -121,7 +126,7 @@ userSchema.pre("save", async function () {
 });
 
 userSchema.pre("findOneAndUpdate", async function () {
-  // getUpdate() returns update specifications not the document or updated document
+  // The getUpdate() returns update specifications not the document or updated document
   const update = this.getUpdate();
 
   if (!update) return;
@@ -188,15 +193,15 @@ userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.hashOTP = async function (otp) {
-  this.OTP = await bcrypt.hash(otp.toString(), 10);
-  this.otpExpiry = Date.now() + 2 * 60 * 1000;
+userSchema.methods.hashPassCode = async function (serverPassCode) {
+  this.passcode = await bcrypt.hash(serverPassCode.toString(), 10);
+  this.passcodeExpiry = Date.now() + 2 * 60 * 1000;
 
   return await this.save();
 };
 
-userSchema.methods.isOtpCorrect = async function (userOTP) {
-  return bcrypt.compare(userOTP, this.OTP);
+userSchema.methods.isPassCodeCorrect = async function (userPassCode) {
+  return bcrypt.compare(userPassCode, this.passcode);
 };
 
 export const User = mongoose.model("User", userSchema);

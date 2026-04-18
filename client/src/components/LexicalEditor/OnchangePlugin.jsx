@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useEffect } from "react";
 
-// the onChange prop is the react-hook-form onChange
+// the onChange prop is the react-hook-form onChange method
 function EditorOnChangePlugin({ onChange }) {
   const [editor] = useLexicalComposerContext();
 
@@ -22,8 +22,7 @@ function EditorOnChangePlugin({ onChange }) {
 
 export default EditorOnChangePlugin;
 
-// NOTE:
-/**
+/**NOTE:
  * The registerUpdateListener callback runs outside React’s render cycle
 
  * Lexical updates its internal state and then calls your listener

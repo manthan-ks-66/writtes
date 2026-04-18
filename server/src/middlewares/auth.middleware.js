@@ -17,7 +17,7 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
     decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      throw new ApiError(401, "Session Expired");
+      throw new ApiError(401, "Id Expired");
     }
 
     throw new ApiError(400, "Invalid Token");

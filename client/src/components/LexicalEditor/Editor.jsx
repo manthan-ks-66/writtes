@@ -9,8 +9,8 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import ToolbarPlugin from "./EditorTools/ToolbarPlugin.jsx";
-import EditorOnChangePlugin from "./EditorOnChangePlugin.jsx";
+import ToolbarPlugin from "./Tools/ToolbarPlugin.jsx";
+import EditorOnChangePlugin from "./OnchangePlugin.jsx";
 
 // css
 import "./Editor.css";
@@ -28,12 +28,12 @@ const theme = {
 };
 
 function onError(error) {
-  console.error("lexical editor error", error);
+  console.log("lexical editor error", error);
 }
 
 function Editor({ control, name = "content" }) {
   const initialConfig = {
-    namespace: "PostEditor",
+    namespace: "Editor",
     theme,
     onError,
     nodes: [HeadingNode, QuoteNode],

@@ -237,7 +237,6 @@ const fetchPost = asyncHandler(async (req, res) => {
       if (error instanceof jwt.TokenExpiredError) {
         // continue to fetch the post for logged out user
       }
-      throw new ApiError(400, "Invalid Session Id");
     }
   }
 

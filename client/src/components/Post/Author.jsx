@@ -2,10 +2,8 @@
 import { Layout, Card, Avatar, Typography, Divider, Space, theme } from "antd";
 import {
   UserOutlined,
-  TwitterOutlined,
   GithubOutlined,
   LinkedinOutlined,
-  GlobalOutlined,
   XOutlined,
   InstagramOutlined,
 } from "@ant-design/icons";
@@ -19,6 +17,33 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import userService from "../../services/userService";
 
+const socialConfig = [
+ {
+    key: "x",
+    label: "X",
+    icon: <XOutlined style={{ color: "currentColor", fontSize: 16 }} />,
+    color: "inherit",
+  },
+  {
+    key: "github",
+    label: "GitHub",
+    icon: <GithubOutlined style={{ color: "currentColor", fontSize: 16 }} />,
+    color: "inherit",
+  },
+  {
+    key: "linkedIn",
+    label: "LinkedIn",
+    icon: <LinkedinOutlined style={{ color: "#0077b5", fontSize: 16 }} />,
+    color: "#0077b5",
+  },
+  {
+    key: "instagram",
+    label: "Instagram",
+    icon: <InstagramOutlined style={{ color: "#c13584", fontSize: 16 }} />,
+    color: "#c13584",
+  },
+]
+
 const Author = () => {
   const { username } = useParams();
   const [error, setError] = useState();
@@ -31,7 +56,7 @@ const Author = () => {
         const authorData = await userService.getAuthor(username);
 
         if (authorData) {
-          setAuthor(authorData);
+          setAuthor(authorData);s
         }
       } catch (error) {
         setError(error.message);
@@ -119,42 +144,28 @@ const Author = () => {
           <Divider />
 
           {/* 4. Social Links */}
-          <Space
-            size="middle"
-            style={{
-              fontSize: "24px",
-              display: "flex",
-              justifyContent: "start",
-            }}
-          >
-            {author?.x && (
-              <a href={author?.x}>
-                <XOutlined style={{ color: "#000", cursor: "pointer" }} />
-              </a>
-            )}
+          {author?.socialLinks && (
+            <Space
+              size="middle"
+              style={{
+                fontSize: "24px",
+                display: "flex",
+                justifyContent: "start",
+              }}
+            >
+              {
+                socialConfig
+              }
 
-            {author?.github && (
-              <a href={author?.github}>
-                <GithubOutlined style={{ color: "#000", cursor: "pointer" }} />
-              </a>
-            )}
-
-            {author?.linkedIn && (
-              <a href={author?.linkedIn}>
-                <LinkedinOutlined
-                  style={{ color: "#0077b5", cursor: "pointer" }}
-                />
-              </a>
-            )}
-
-            {author?.instagram && (
-              <a href={author?.instagram}>
-                <InstagramOutlined
-                  style={{ color: "#833ab4", cursor: "pointer" }}
-                />
-              </a>
-            )}
-          </Space>
+              {author?.socialLinks?.instagram && (
+                <a href={author?.socialLinks?.instagram}>
+                  <InstagramOutlined
+                    style={{ color: "#833ab4", cursor: "pointer" }}
+                  />
+                </a>
+              )}
+            </Space>
+          )}
         </Card>
       </Content>
     </Layout>

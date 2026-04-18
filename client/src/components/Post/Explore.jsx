@@ -121,7 +121,7 @@ function Explore() {
           <div style={{ marginTop: "auto" }}>
             <Pagination
               onChange={(newPage) => {
-                navigate(`/explore-posts?page=${newPage}&limit=${limit}`);
+                navigate(`/explore?page=${newPage}&limit=${limit}`);
                 window.scrollTo(0, 0);
               }}
               current={page}

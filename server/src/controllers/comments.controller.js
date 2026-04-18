@@ -6,7 +6,6 @@ import { ApiError } from "../utils/ApiError.js";
 import { isValidObjectId } from "mongoose";
 import asyncHandler from "../utils/asyncHandler.js";
 
-// Controller: Add Comment
 const addComment = asyncHandler(async (req, res) => {
   const { postId, comment } = req.body;
   const commentedBy = req.user?._id;
@@ -34,7 +33,6 @@ const addComment = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, "Comment added successfully", userComment));
 });
 
-// Controller: Like / Unlike comment
 const toggleCommentLike = asyncHandler(async (req, res) => {
   const { commentId } = req.body;
   const likedBy = req.user?._id;
@@ -71,9 +69,8 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "comment like toggled successfully", comment));
 });
 
-// Controller: Get Post comments
-const getPostComments = asyncHandler(async (req, res) => {
+const fetchPostComments = asyncHandler(async (req, res) => {
   const { postId } = req.query;
-})
+});
 
-export { addComment, toggleCommentLike };
+export { addComment, toggleCommentLike, fetchPostComments };

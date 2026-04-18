@@ -48,8 +48,6 @@ function Register() {
 
       if (res.status === 201 || res.status === 200) {
         sessionStorage.setItem("email", userData.email);
-        sessionStorage.setItem("verificationStatus", true);
-
         navigate("/auth/register/verify");
       }
     } catch (error) {

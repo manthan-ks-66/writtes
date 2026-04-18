@@ -1,8 +1,8 @@
 import { Outlet } from "react-router-dom";
-import NavBar from "./components/Header/NavBar";
+import NavBar from "./components/Header/NavBar.jsx";
 import AppFooter from "./components/Footer/Footer.jsx";
 
-function DashBoard() {
+function Dashboard() {
   return (
     <>
       <NavBar />
@@ -14,4 +14,4 @@ function DashBoard() {
   );
 }
 
-export default DashBoard;
+export default Dashboard;

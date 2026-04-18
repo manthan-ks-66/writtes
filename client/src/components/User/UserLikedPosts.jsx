@@ -33,7 +33,7 @@ function UserLikedPosts() {
 
   if (userLikedPosts && !loading)
     return userLikedPosts.map((userLikedPost) => (
-      <PostCard2 key={userLikedPost?._id} {...userLikedPost} />
+      <PostCard2 key={userLikedPost?.userLikedPost?._id} {...userLikedPost} />
     ));
 }
 

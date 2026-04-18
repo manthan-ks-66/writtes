@@ -1,6 +1,6 @@
 // react imports
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 
 // redux imports
@@ -27,7 +27,6 @@ function Login() {
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const {
     control,
@@ -38,6 +37,7 @@ function Login() {
   const { token } = theme.useToken();
 
   const handleLogin = async (userData) => {
+    setLoading(true);
     try {
       const user = await authService.loginUser(userData);
       if (user) {
@@ -50,7 +50,7 @@ function Login() {
         });
       }
 
-      navigate("/");
+      return <Navigate to="/" replace />;
     } catch (error) {
       setError(error.message);
     } finally {
@@ -152,10 +152,6 @@ function Login() {
                 control={control}
                 rules={{
                   required: "Username is required",
-                  pattern: {
-                    value: /^[a-zA-Z0-9_-]+$/,
-                    message: "Only _ and - are allowed",
-                  },
                 }}
                 render={({ field }) => (
                   <Input
