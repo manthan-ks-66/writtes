@@ -38,7 +38,7 @@ const generateAndMailPassCode = async (processMsg, user, email, subject) => {
   const mailHTML = returnCodeMail(processMsg, firstName, email, subject, otp);
 
   await resend.emails.send({
-    from: "WRITTES <authentication@verify.writtes.com>",
+    from: "WRITTES <noreply@verify.writtes.com>",
     to: email,
     subject: subject,
     html: mailHTML,
@@ -93,7 +93,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (existedUser) {
     if (existedUser.isVerified) {
-      throw new ApiError(400, "User is already registered");
+      throw new ApiError(400, "User is registered - Proceed to login");
     }
 
     Object.assign(existedUser, {

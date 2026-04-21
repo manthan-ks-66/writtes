@@ -1,4 +1,4 @@
-// Higher order function for handling async operations:
+// try catch wrapper for async operations
 const asyncHandler = (requestHandler) => {
   return (req, res, next) => {
     Promise.resolve(requestHandler(req, res, next)).catch((err) => {

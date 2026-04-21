@@ -29,7 +29,7 @@ const alignmentOptions = [
     label: "Left",
     key: "left",
     icon: <AlignLeftOutlined />,
-  },
+  },  
   {
     label: "Center",
     key: "center",
