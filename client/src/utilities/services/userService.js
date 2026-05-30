@@ -1,4 +1,4 @@
-import { userInstance } from "../axios/axiosInstances.js";
+import { userInstance } from "../config/axiosInstances.js";
 
 class UserService {
   async updateUserAvatar(formData) {

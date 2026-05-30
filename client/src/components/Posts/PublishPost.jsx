@@ -17,12 +17,14 @@ import {
   RocketOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
-import Editor from "../Editor/Editor.jsx";
+import Editor from "../LexicalEditor/Editor.jsx";
 
 import { useForm, Controller } from "react-hook-form";
 import { useEffect, useState } from "react";
+import { useNotify } from "../../context/NotificationProvider.jsx";
 
-import postService from "../../services/postService.js";
+import postService from "../../utilities/services/postService.js";
+import getPlacements from "antd/es/_util/placements.js";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -31,6 +33,7 @@ const { Option } = Select;
 function PublishPost() {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
+  const notify = useNotify();
 
   const [error, setError] = useState("");
 
@@ -71,25 +74,30 @@ function PublishPost() {
   }, [watch, setValue]);
 
   const submitPost = async (data) => {
-    console.log(data);
-    let postFormData = new FormData();
+    // console.log(data);
+    // let postFormData = new FormData();
 
-    for (let val in data) {
-      if (typeof val !== "object") {
-        postFormData.append(val, data[val]);
-      }
-    }
+    // for (let val in data) {
+    //   if (typeof val !== "object") {
+    //     postFormData.append(val, data[val]);
+    //   }
+    // }
 
-    if (data.featuredImage && data.featuredImage[0]) {
-      postFormData.append("featuredImage", data.featuredImage[0].originFileObj);
-    }
+    // if (data.featuredImage && data.featuredImage[0]) {
+    //   postFormData.append("featuredImage", data.featuredImage[0].originFileObj);
+    // }
 
-    try {
-      // const post = await postService.publishPost(postFormData);
-      // console.log(post);
-    } catch (error) {
-      setError(error.message);
-    }
+    // try {
+    //   // const post = await postService.publishPost(postFormData);
+    //   // console.log(post);
+    // } catch (error) {
+    //   setError(error.message);
+    // }
+
+    notify.api.info({
+      title: "Under Development",
+      placement: "top",
+    });
   };
 
   const handlePostForm = () => {
@@ -116,6 +124,19 @@ function PublishPost() {
       }}
     >
       <Content>
+        <div
+          style={{
+            color: "green",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          className="under-development"
+        >
+          <h3>UNDER DEVELOPMENT</h3>
+          <h4>Rich Text Editor Integration work is in progress...</h4>
+        </div>
         <div style={containerStyle}>
           <Form
             form={form}
@@ -225,9 +246,9 @@ function PublishPost() {
                 type="primary"
                 htmlType="submit"
                 size="middle"
-                icon={<RocketOutlined />}
                 block
                 style={{
+                  marginTop: "20px",
                   width: "200px",
                   height: "45px",
                   fontSize: "15px",

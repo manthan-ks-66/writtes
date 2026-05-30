@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import userService from "../../services/userService.js";
-import AntdSpin from "../AntdSpin.jsx";
+import userService from "../../utilities/services/userService.js";
+import AntdSpin from "../Generals/AntdSpin.jsx";
 
 import { Typography } from "antd";
 const { Text } = Typography;
 
-import PostCard2 from "../Post/PostCard2.jsx";
+import PostCard2 from "../Posts/PostCard2.jsx";
 
 function UserLikedPosts() {
   const [userLikedPosts, setUserLikedPosts] = useState([]);

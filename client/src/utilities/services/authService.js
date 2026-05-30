@@ -1,4 +1,4 @@
-import { userInstance } from "../axios/axiosInstances.js";
+import { userInstance } from "../config/axiosInstances.js";
 
 class AuthService {
   async authenticateWithGoogle({ code }) {
@@ -18,7 +18,7 @@ class AuthService {
 
   async verifyAndLoginUser({ otp }) {
     const response = await userInstance.post("/verify-user", {
-      otp: otp.toString(),
+      otp: otp?.toString(),
     });
     return response.data?.data;
   }

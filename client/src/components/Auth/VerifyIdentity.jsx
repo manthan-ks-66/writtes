@@ -3,7 +3,7 @@ import { ArrowLeftOutlined, MailOutlined } from "@ant-design/icons";
 import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import authService from "../../services/authService";
+import authService from "../../utilities/services/authService.js";
 
 const { Title, Text } = Typography;
 

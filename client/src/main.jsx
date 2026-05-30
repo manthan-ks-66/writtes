@@ -19,7 +19,7 @@ import Dashboard from "./Dashboard.jsx";
 import Register from "./components/Auth/Register.jsx";
 import Login from "./components/Auth/Login.jsx";
 import ResetPasswordInput from "./components/Auth/ResetPasswordInput.jsx";
-import RegistrationOtpInput from "./components/Auth/RegistrationOtpInput.jsx";
+import RegistrationOtpInput from "./components/Auth/RegistrationCodeInput.jsx";
 import VerifyIdentity from "./components/Auth/VerifyIdentity.jsx";
 
 // general components - Public access
@@ -31,13 +31,13 @@ import NotFound from "./components/Generals/NotFound.jsx";
 import AuthLayout from "./components/Guard/AuthLayout.jsx";
 
 // Post components - Public access
-import PostPage from "./components/Post/PostPage.jsx";
-import Explore from "./components/Post/Explore.jsx";
-import QueryPosts from "./components/Post/QueryPosts.jsx";
-import Author from "./components/Post/Author.jsx";
+import PostPage from "./components/Posts/PostPage.jsx";
+import Explore from "./components/Posts/Explore.jsx";
+import QueryPosts from "./components/Posts/QueryPosts.jsx";
+import Author from "./components/Posts/Author.jsx";
 
 // Protected post components
-import PublishPost from "./components/Post/PublishPost.jsx";
+import PublishPost from "./components/Posts/PublishPost.jsx";
 
 // Users components (under protected routes - /user)
 import UserTabs from "./components/User/UserTabs.jsx";
@@ -45,9 +45,9 @@ import Settings from "./components/User/Settings.jsx";
 import UserProfile from "./components/User/UserProfile.jsx";
 import UserComments from "./components/User/UserComments.jsx";
 import UserLikedPosts from "./components/User/UserLikedPosts.jsx";
-import UserWrites from "./components/User/UserWrites.jsx";
+import UserPosts from "./components/User/UserPosts.jsx";
 
-const postlyDarkTheme = {
+const writtesDarkTheme = {
   algorithm: antdTheme.darkAlgorithm,
   token: {
     // Brand color
@@ -119,9 +119,9 @@ const router = createBrowserRouter([
           {
             path: "/post/new/write",
             element: (
-              // <AuthLayout>
-              <PublishPost />
-              // </AuthLayout>
+              <AuthLayout>
+                <PublishPost />
+              </AuthLayout>
             ),
           },
           {
@@ -169,7 +169,7 @@ const router = createBrowserRouter([
                 path: "your-writes",
                 element: (
                   <AuthLayout>
-                    <UserWrites />
+                    <UserPosts />
                   </AuthLayout>
                 ),
               },
@@ -248,7 +248,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID}>
-      <ConfigProvider theme={postlyDarkTheme}>
+      <ConfigProvider theme={writtesDarkTheme}>
         <NotificationProvider>
           <RouterProvider router={router} />
         </NotificationProvider>

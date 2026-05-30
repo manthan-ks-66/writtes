@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 // services imports
-import authService from "../../services/authService.js";
+import authService from "../../utilities/services/authService.js";
 
 // react hook form
 import { useForm, Controller } from "react-hook-form";

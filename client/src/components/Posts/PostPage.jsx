@@ -22,7 +22,7 @@ import {
 } from "@ant-design/icons";
 import "./PostPage.css";
 
-import postService from "../../services/postService.js";
+import postService from "../../utilities/services/postService.js";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -53,13 +53,20 @@ function PostPage() {
     comments: [
       {
         id: 1,
-        body: "This is good",
+        body: "Demo Comment",
       },
       {
         id: 2,
-        body: "This is good",
+        body: "Demo Comment",
       },
     ],
+  };
+
+  const showNotification = () => {
+    notify.api.info({
+      title: "Under Development",
+      placement: "top",
+    });
   };
 
   const copyToClipboard = () => {
@@ -307,7 +314,9 @@ function PostPage() {
                 className="comment-input"
                 placeholder="Write a comment..."
               />
-              <Button type="primary">Add</Button>
+              <Button onClick={showNotification} type="primary">
+                Add
+              </Button>
             </Flex>
             <Space vertical size="middle" className="comments-list">
               {data.comments.map((comment) => (

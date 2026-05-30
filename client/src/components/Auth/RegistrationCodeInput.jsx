@@ -7,7 +7,7 @@ const { Title, Text } = Typography;
 
 // redux and services imports
 import { login } from "../../store/authSlice.js";
-import authService from "../../services/authService.js";
+import authService from "../../utilities/services/authService.js";
 import { useDispatch } from "react-redux";
 
 // antd notification
@@ -27,7 +27,6 @@ const RegistrationOtpInput = () => {
   const dispatch = useDispatch();
   const notify = useNotify();
   const navigate = useNavigate();
-
 
   const handleVerify = async () => {
     try {

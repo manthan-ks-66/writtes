@@ -6,8 +6,10 @@ import {
   LinkedinOutlined,
   XOutlined,
   InstagramOutlined,
+  GithubFilled,
+  LinkedinFilled,
 } from "@ant-design/icons";
-import AntdSpin from "../AntdSpin.jsx";
+import AntdSpin from "../Generals/AntdSpin.jsx";
 
 const { Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -15,10 +17,10 @@ const { Title, Text, Paragraph } = Typography;
 // react and service imports
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import userService from "../../services/userService";
+import userService from "../../utilities/services/userService.js";
 
 const socialConfig = [
- {
+  {
     key: "x",
     label: "X",
     icon: <XOutlined style={{ color: "currentColor", fontSize: 16 }} />,
@@ -42,7 +44,7 @@ const socialConfig = [
     icon: <InstagramOutlined style={{ color: "#c13584", fontSize: 16 }} />,
     color: "#c13584",
   },
-]
+];
 
 const Author = () => {
   const { username } = useParams();
@@ -56,7 +58,7 @@ const Author = () => {
         const authorData = await userService.getAuthor(username);
 
         if (authorData) {
-          setAuthor(authorData);s
+          setAuthor(authorData);
         }
       } catch (error) {
         setError(error.message);
@@ -67,6 +69,8 @@ const Author = () => {
 
     handleFetchAuthor(username);
   }, [username]);
+
+  console.log(author);
 
   const { token } = theme.useToken();
 
@@ -124,39 +128,17 @@ const Author = () => {
             </Text>
           </div>
 
-          <Divider />
-
-          {/* 3. Bio & About Section */}
-          <div style={{ textAlign: "left" }}>
-            <Title level={4}>Bio</Title>
-            <Paragraph style={{ fontSize: "16px" }}>
-              {author?.bio === "" ? "No Bio" : author.bio}
-            </Paragraph>
-
-            <Title level={4} style={{ marginTop: "24px" }}>
-              About
-            </Title>
-            <Paragraph type="secondary" style={{ lineHeight: "1.8" }}>
-              {author?.about === "" ? "No About" : author.about}
-            </Paragraph>
-          </div>
-
-          <Divider />
-
-          {/* 4. Social Links */}
+          {/* 3. Social Links */}
           {author?.socialLinks && (
             <Space
               size="middle"
               style={{
+                marginTop: "20px",
                 fontSize: "24px",
                 display: "flex",
-                justifyContent: "start",
+                justifyContent: "center",
               }}
             >
-              {
-                socialConfig
-              }
-
               {author?.socialLinks?.instagram && (
                 <a href={author?.socialLinks?.instagram}>
                   <InstagramOutlined
@@ -164,8 +146,49 @@ const Author = () => {
                   />
                 </a>
               )}
+
+              {author?.socialLinks?.x && (
+                <a href={author?.socialLinks?.x}>
+                  <XOutlined style={{ color: "#ffffff", cursor: "pointer" }} />
+                </a>
+              )}
+
+              {author?.socialLinks?.github && (
+                <a href={author?.socialLinks?.github}>
+                  <GithubFilled
+                    style={{ color: "#767676", cursor: "pointer" }}
+                  />
+                </a>
+              )}
+
+              {author?.socialLinks?.linkedIn && (
+                <a href={author?.socialLinks?.linkedIn}>
+                  <LinkedinFilled
+                    style={{ color: "#0077b5", cursor: "pointer" }}
+                  />
+                </a>
+              )}
             </Space>
           )}
+
+          <Divider />
+
+          {/* 4. Bio & About Section */}
+          <div style={{ textAlign: "left" }}>
+            <Title level={4}>Bio</Title>
+            <Paragraph style={{ fontSize: "16px" }}>
+              {author?.profile?.bio === "" ? "No Bio" : author?.profile?.bio}
+            </Paragraph>
+
+            <Title level={4} style={{ marginTop: "24px" }}>
+              About
+            </Title>
+            <Paragraph style={{ lineHeight: "1.8" }}>
+              {author?.profile?.about === ""
+                ? "No About"
+                : author?.profile?.about}
+            </Paragraph>
+          </div>
         </Card>
       </Content>
     </Layout>

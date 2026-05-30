@@ -29,7 +29,7 @@ const userTabItems = [
   {
     key: "/account/your-writes",
     icon: <FormOutlined />,
-    label: "Your Writes",
+    label: "Your Posts",
   },
   {
     key: "/account/comments",

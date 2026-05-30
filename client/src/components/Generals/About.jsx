@@ -62,7 +62,7 @@ function About() {
               lineHeight: "1.8",
             }}
           >
-            Prose, founded with a simple mission: to bridge the gap between
+            Writtes, founded with a simple mission: to bridge the gap between
             complex technology and human storytelling. In a world of
             fast-scrolling content, we created a space for meaningful innovation
             and creative depth.

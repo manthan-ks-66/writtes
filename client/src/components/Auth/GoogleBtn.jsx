@@ -1,7 +1,7 @@
 import { Button } from "antd";
 import { useNotify } from "../../context/NotificationProvider";
 import { useGoogleLogin } from "@react-oauth/google";
-import authService from "../../services/authService";
+import authService from "../../utilities/services/authService.js";
 import { useDispatch } from "react-redux";
 import { login } from "../../store/authSlice";
 import { useNavigate } from "react-router-dom";

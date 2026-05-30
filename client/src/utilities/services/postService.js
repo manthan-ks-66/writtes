@@ -1,4 +1,4 @@
-import { postInstance } from "../axios/axiosInstances.js";
+import { postInstance } from "../config/axiosInstances.js";
 
 class PostService {
   async fetchPosts(query) {

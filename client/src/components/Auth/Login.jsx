@@ -4,8 +4,8 @@ import { Link, Navigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 
 // redux imports
+import authService from "../../utilities/services/authService.js";
 import { useDispatch } from "react-redux";
-import authService from "../../services/authService.js";
 import { login } from "../../store/authSlice.js";
 
 // antd imports

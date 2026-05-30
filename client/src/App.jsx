@@ -1,9 +1,9 @@
 import { Outlet } from "react-router-dom";
-import AntdSpin from "./components/AntdSpin.jsx";
+import AntdSpin from "./components/Generals/AntdSpin.jsx";
 
 // methods and services
 import { useEffect, useState } from "react";
-import authService from "./services/authService.js";
+import authService from "./utilities/services/authService.js";
 import { useDispatch } from "react-redux";
 import { login, logout } from "./store/authSlice.js";
 

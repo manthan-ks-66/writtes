@@ -22,15 +22,15 @@ function EditorOnChangePlugin({ onChange }) {
 
 export default EditorOnChangePlugin;
 
-/**NOTE:
+/**NOTES:
  * The registerUpdateListener callback runs outside React’s render cycle
-
+ *
  * Lexical updates its internal state and then calls your listener
-
- * This does not cause your React components 
-  - (like in this case EditorOnChangePlugin or the Editor wrapper in Editor.jsx) to re-render on every keystroke
-
+ *
+ * This does not cause your React components
+ * - (like in this case EditorOnChangePlugin or the Editor wrapper in Editor.jsx) to re-render on every keystroke
+ *
  * The plugin itself is stable — it only sets up the listener once via useEffect
-
+ *
  * What changes is Lexical’s internal state, which you can observe with => console.log(editorState)
  */

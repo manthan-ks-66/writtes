@@ -29,8 +29,8 @@ const handleAxiosInterceptor = (axiosInstance) => {
         !originalRequest._retry
       ) {
         /* if 2nd or more reqs comes after the first original req which got the 401 unauthorized error
-         * add those reqs to waiting queue []
-         * The .then() will process the reqs again when the promises get resolved from the processQueue()
+         * add those reqs to waiting queue [] and after that
+         * The .then() implementation will process the reqs again when the promises get resolved from the processQueue()
          */
         if (isRefreshing) {
           return new Promise((resolve, reject) => {

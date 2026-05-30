@@ -29,7 +29,7 @@ import {
 } from "@ant-design/icons";
 
 import { useNotify } from "../../context/NotificationProvider.jsx";
-import userService from "../../services/userService";
+import userService from "../../utilities/services/userService.js";
 import { update } from "../../store/authSlice.js";
 
 const { Title, Text } = Typography;

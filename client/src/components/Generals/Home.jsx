@@ -76,7 +76,7 @@ function Home() {
               Start Writing
             </Button>
             <Button
-              onClick={() => navigate("/explore-posts?page=1&limit=5")}
+              onClick={() => navigate("/explore?page=1&limit=5")}
               size="middle"
             >
               Explore Posts

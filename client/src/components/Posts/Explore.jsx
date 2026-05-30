@@ -1,7 +1,7 @@
 import { Content } from "antd/es/layout/layout";
 import PostCard from "./PostCard.jsx";
 import { Layout, theme, Pagination, Spin } from "antd";
-import postService from "../../services/postService.js";
+import postService from "../../utilities/services/postService.js";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
@@ -114,6 +114,13 @@ function Explore() {
             margin: "0 auto",
           }}
         >
+          <div
+            style={{ color: "green", alignSelf: "center" }}
+            className="info-container"
+          >
+            <h2>DEMO DATA</h2>
+          </div>
+          
           {posts.map((post) => (
             <PostCard key={post._id} {...post} />
           ))}

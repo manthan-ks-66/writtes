@@ -1,11 +1,11 @@
 import { Layout, theme, Pagination, Spin, Alert } from "antd";
 import { Content } from "antd/es/layout/layout";
 
-import postService from "../../services/postService";
+import postService from "../../utilities/services/postService.js";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
-import PostCard from "./PostCard";
+import PostCard from "./PostCard.jsx";
 
 function QueryPosts() {
   const { token } = theme.useToken();
@@ -110,6 +110,13 @@ function QueryPosts() {
           margin: "0 auto",
         }}
       >
+        <div
+          style={{ color: "green", alignSelf: "center" }}
+          className="info-container"
+        >
+          <h2>DEMO DATA</h2>
+        </div>
+
         {posts?.map((post) => (
           <PostCard key={post._id} {...post} />
         ))}

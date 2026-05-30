@@ -24,7 +24,7 @@ import "./NavBar.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import authService from "../../services/authService.js";
+import authService from "../../utilities/services/authService.js";
 import { logout } from "../../store/authSlice.js";
 import { useDispatch } from "react-redux";
 import { useNotify } from "../../context/NotificationProvider.jsx";
