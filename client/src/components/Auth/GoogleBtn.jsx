@@ -1,5 +1,5 @@
 import { Button } from "antd";
-import { useNotify } from "../../context/NotificationProvider";
+import { useNotify } from "../../context/NotificationProvider.jsx";
 import { useGoogleLogin } from "@react-oauth/google";
 import authService from "../../utilities/services/authService.js";
 import { useDispatch } from "react-redux";

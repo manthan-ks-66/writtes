@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import authService from "../../utilities/services/authService.js";
 import { Card, Form, Input, Button, Typography, Layout, theme } from "antd";
 import { LockFilled, LockOutlined, SafetyOutlined } from "@ant-design/icons";
-import { useNotify } from "../../context/NotificationProvider";
+import { useNotify } from "../../context/NotificationProvider.jsx";
 
 const { Title, Text } = Typography;
 

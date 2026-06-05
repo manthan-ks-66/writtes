@@ -1,5 +1,5 @@
 import axios from "axios";
-import handleAxiosInterceptor from "./interceptorHandler";
+import handleAxiosInterceptor from "./interceptorHandler.js";
 
 const usersBaseUrl = import.meta.env.VITE_USERS_API_BASE_URL;
 const postsBaseUrl = import.meta.env.VITE_POSTS_API_BASE_URL;
