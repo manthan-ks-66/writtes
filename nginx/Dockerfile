@@ -1,6 +1,6 @@
 # Context - Root directoy .
 # stage 1 - react build stage
-FROM node:25-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
