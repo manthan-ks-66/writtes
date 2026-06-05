@@ -1,5 +1,11 @@
-const returnCodeMail = function (processMsg, firstName, email, subject, otp) {
-  if ([processMsg, email, subject, otp].some((field) => !field)) {
+const returnCodeMail = function (
+  processMsg,
+  firstName,
+  email,
+  subject,
+  serverPassCode,
+) {
+  if ([processMsg, email, subject, serverPassCode].some((field) => !field)) {
     return "";
   }
 
@@ -80,7 +86,7 @@ const returnCodeMail = function (processMsg, firstName, email, subject, otp) {
               <table border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto 32px auto;">
                 <tr>
                   <td class="otp-box" style="background: linear-gradient(135deg, #f2f9ec 0%, #eaf5e0 100%); padding: 24px 48px; text-align: center;">
-                    <span class="otp-text" style="font-family: 'Noto Sans', 'PingFang SC', 'Alibaba PuHuiTi', sans-serif; font-size: 42px; font-weight: 400; letter-spacing: 14px; color: #55aa00; display: block;">${otp}</span>
+                    <span class="otp-text" style="font-family: 'Noto Sans', 'PingFang SC', 'Alibaba PuHuiTi', sans-serif; font-size: 42px; font-weight: 400; letter-spacing: 14px; color: #55aa00; display: block;">${serverPassCode}</span>
                   </td>
                 </tr>
               </table>

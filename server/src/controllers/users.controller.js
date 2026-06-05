@@ -24,21 +24,32 @@ const resend = new Resend(process.env.RESEND_VERIFICATION_MAIL_API_KEY);
 const options = {
   httpOnly: true,
   secure: true,
-  sameSite: "None",
+  sameSite: "Strict",
 };
 
 // user OTP generator method
-const generateAndMailPassCode = async (processMsg, user, email, subject) => {
+const generateAndDeliverMailPassCode = async (
+  processMsg,
+  user,
+  email,
+  subject,
+) => {
   const serverPassCode = randomInt(100000, 999999);
 
   await user.hashPassCode(serverPassCode);
   await user.save();
 
   const firstName = user.fullName.trim().split(" ")[0];
-  const mailHTML = returnCodeMail(processMsg, firstName, email, subject, otp);
+  const mailHTML = returnCodeMail(
+    processMsg,
+    firstName,
+    email,
+    subject,
+    serverPassCode,
+  );
 
   await resend.emails.send({
-    from: "WRITTES <noreply@verify.writtes.com>",
+    from: "WRITTES <noreply@auth.writtes.com>",
     to: email,
     subject: subject,
     html: mailHTML,
@@ -104,11 +115,11 @@ const registerUser = asyncHandler(async (req, res) => {
       lifeTime: Date.now(),
     });
 
-    await generateAndMailPassCode(
+    await generateAndDeliverMailPassCode(
       "registration process",
       existedUser,
       email,
-      "User Registration OTP",
+      "User Registration Passcode",
     );
 
     const verificationToken = existedUser.generateVerificationToken();
@@ -117,7 +128,10 @@ const registerUser = asyncHandler(async (req, res) => {
       .status(201)
       .cookie("verificationToken", verificationToken, options)
       .json(
-        new ApiResponse(200, "OTP for registration has been sent successfully"),
+        new ApiResponse(
+          200,
+          "OTP for registration has been delivered successfully",
+        ),
       );
   }
 
@@ -135,11 +149,11 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "User registration failed");
   }
 
-  await generateAndMailPassCode(
+  await generateAndDeliverMailPassCode(
     "registration process",
     user,
     email,
-    "One Time Password for user registration",
+    "One Time Passcode for registration",
   );
 
   const verificationToken = user.generateVerificationToken();
@@ -177,17 +191,20 @@ const regenerateRegistrationOTP = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User is verified");
   }
 
-  await generateAndSendOTP(
+  await generateAndDeliverMailPassCode(
     "registration process",
     user,
     user.email,
-    "One Time Password for user registration",
+    "One Time Passcode for registration",
   );
 
   return res
     .status(200)
     .json(
-      new ApiResponse(200, "OTP re-sent to the registered email successfully"),
+      new ApiResponse(
+        200,
+        "OTP delivered to the registered email successfully",
+      ),
     );
 });
 
@@ -225,7 +242,9 @@ const verifyAndLoginUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid token");
   }
 
-  const userAccount = await User.findOne({ _id: decodedToken._id });
+  const userAccount = await User.findOne({ _id: decodedToken._id }).select(
+    "+passcode +passcodeExpiry",
+  );
 
   if (!userAccount) {
     throw new ApiError(400, "User not found");
@@ -233,7 +252,7 @@ const verifyAndLoginUser = asyncHandler(async (req, res) => {
 
   const userId = userAccount._id;
 
-  if (Date.now() > userAccount.otpExpiry) {
+  if (Date.now() > userAccount.passcodeExpiry) {
     throw new ApiError(400, "OTP is expired! Register Again");
   }
 
@@ -252,8 +271,8 @@ const verifyAndLoginUser = asyncHandler(async (req, res) => {
       },
       $unset: {
         lifeTime: true,
-        OTP: true,
-        otpExpiry: true,
+        passcode: true,
+        passcodeExpiry: true,
       },
     },
     { new: true },
@@ -271,7 +290,7 @@ const verifyAndLoginUser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        "User verified and user tokens returned successfully",
+        "User verified and tokens returned successfully",
         user.toJSON(),
       ),
     );
@@ -540,7 +559,8 @@ const handleResetPasswordOTP = asyncHandler(async (req, res) => {
 
   send the cryptoOtp to user in mail
   
-  return res as otp sent */
+  return res as otp sent 
+  */
 
   const { email } = req.body;
 
@@ -550,11 +570,11 @@ const handleResetPasswordOTP = asyncHandler(async (req, res) => {
     throw new ApiError(400, "User with this email is not registered");
   }
 
-  await generateAndMailPassCode(
+  await generateAndDeliverMailPassCode(
     "password reset process",
     user,
     email,
-    "Password reset One Time PassCode",
+    "Password reset One Time Passcode",
   );
 
   const verificationToken = user.generateVerificationToken();

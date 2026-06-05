@@ -1,7 +1,27 @@
 services:
-  nginx:
-    image: nginx
-
-  client:
-
-  server:
+  s-one:
+    build:
+      context: ./server
+    networks:
+      - writtes-net
+  s-two:
+    build:
+      context: ./server
+    networks:
+      - writtes-net
+  s-three:
+    build:
+      context: ./server
+    networks:
+      - writtes-net
+  app:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - writtes-net
+networks:
+  writtes-net:
+    driver: bridge

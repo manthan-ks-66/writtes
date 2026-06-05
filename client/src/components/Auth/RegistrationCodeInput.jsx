@@ -110,7 +110,8 @@ const RegistrationOtpInput = () => {
               Check your email
             </Title>
             <Text type="secondary">
-              Enter the 6 digit OTP sent to
+              Enter the 6 digit one time passcode sent to the registered email
+              address
               <br />
               <strong>{email}</strong>
             </Text>
