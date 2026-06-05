@@ -18,10 +18,19 @@ services:
     build:
       context: .
       dockerfile: nginx/Dockerfile
+    depends_on:
+      - s-one
+      - s-two
+      - s-three
     ports:
+      - "80:80"
       - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
     networks:
       - writtes-net
+    restart: unless-stopped
 networks:
   writtes-net:
     driver: bridge
