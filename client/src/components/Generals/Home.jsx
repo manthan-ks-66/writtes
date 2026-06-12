@@ -46,7 +46,11 @@ function Home() {
   return (
     <Layout style={{ minHeight: "100vh", background: token.colorBgLayout }}>
       <Content
-        style={{ padding: "40px 20px", maxWidth: "1200px", margin: "0 auto" }}
+        style={{
+          padding: "40px 20px",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
       >
         {/* Hero Section */}
         <div
@@ -65,7 +69,7 @@ function Home() {
             }}
           >
             Share your boldest ideas, showcase your creativity, and explore the
-            latest in tech. Postly is the home for thinkers and creators.
+            latest in tech. WRITTES is the home for thinkers and creators.
           </Paragraph>
           <Space size="middle">
             <Button
@@ -85,67 +89,32 @@ function Home() {
         </div>
 
         {/* Featured Posts Grid */}
-        <Title level={4} style={{ marginBottom: 20, fontSize: "20px" }}>
-          Most Liked
+        <Title
+          level={4}
+          style={{
+            color: "green",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: 20,
+            fontSize: "20px",
+          }}
+        >
+          Demo Access
         </Title>
-        <Row gutter={[16, 16]}>
-          {featuredPosts.map((post, index) => (
-            <Col xs={24} sm={12} md={8} key={index}>
-              <Card
-                hoverable
-                style={{
-                  background: "#ffffff1e",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: 12,
-                }}
-                styles={{ padding: "20px" }}
-              >
-                <Tag
-                  color="black"
-                  style={{
-                    marginBottom: 12,
-                    borderRadius: 4,
-                    fontSize: "10px",
-                  }}
-                >
-                  {post.category}
-                </Tag>
-                <Title
-                  level={5}
-                  style={{ margin: "0 0 10px 0", fontSize: "16px" }}
-                >
-                  {post.title}
-                </Title>
-                <Paragraph
-                  ellipsis={{ rows: 2 }}
-                  style={{ fontSize: "13px", color: token.colorTextSecondary }}
-                >
-                  This is a brief summary of the post content to spark interest
-                  in the reader...
-                </Paragraph>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginTop: 16,
-                  }}
-                >
-                  <Text style={{ fontSize: "12px" }} type="secondary">
-                    5 min read
-                  </Text>
-                  <Button
-                    type="link"
-                    size="small"
-                    style={{ padding: 0, color: token.colorPrimary }}
-                  >
-                    Read More
-                  </Button>
-                </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <h4>For tester login use the follwing credentials</h4>
+          <p>username as tester</p>
+          <p>password as Test@123</p>
+        </div>
 
         {/* Categories / Focus Areas */}
         <Row gutter={[24, 24]} style={{ marginTop: 50 }}>
