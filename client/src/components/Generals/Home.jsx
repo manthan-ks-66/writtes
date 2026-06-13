@@ -7,6 +7,7 @@ import {
   Card,
   Tag,
   Space,
+  Divider,
   theme,
 } from "antd";
 import {
@@ -14,8 +15,12 @@ import {
   BulbOutlined,
   ExperimentOutlined,
   ShareAltOutlined,
+  UserOutlined,
+  LockOutlined,
+  CopyOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const { Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -23,25 +28,51 @@ const { Title, Text, Paragraph } = Typography;
 function Home() {
   const { token } = theme.useToken();
   const navigate = useNavigate();
+  const [copied, setCopied] = useState(null);
 
-  // Sample data to show tech/innovation focus
-  const featuredPosts = [
-    {
-      title: "The Future of AI in Web Dev",
-      category: "Tech",
-      icon: <RocketOutlined />,
-    },
-    {
-      title: "Unlocking Creative Blocks",
-      category: "Creativity",
-      icon: <BulbOutlined />,
-    },
-    {
-      title: "Sustainable Tech Innovations",
-      category: "Innovation",
-      icon: <ExperimentOutlined />,
-    },
-  ];
+  const handleCopy = (text, field) => {
+    navigator.clipboard.writeText(text);
+    setCopied(field);
+    setTimeout(() => setCopied(null), 1500);
+  };
+
+  const credentialRow = (icon, label, value, field) => (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        background: token.colorFillAlter,
+        borderRadius: token.borderRadiusSM,
+        padding: "10px 14px",
+        gap: 12,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ color: token.colorPrimary, fontSize: 15 }}>{icon}</span>
+        <Text type="secondary" style={{ fontSize: 12, minWidth: 70 }}>
+          {label}
+        </Text>
+        <Text strong style={{ fontSize: 13, letterSpacing: "0.3px" }}>
+          {value}
+        </Text>
+      </div>
+      <Button
+        type="text"
+        size="small"
+        icon={<CopyOutlined />}
+        onClick={() => handleCopy(value, field)}
+        style={{
+          color:
+            copied === field ? token.colorSuccess : token.colorTextTertiary,
+          fontSize: 12,
+          padding: "0 6px",
+        }}
+      >
+        {copied === field ? "Copied!" : "Copy"}
+      </Button>
+    </div>
+  );
 
   return (
     <Layout style={{ minHeight: "100vh", background: token.colorBgLayout }}>
@@ -50,6 +81,8 @@ function Home() {
           padding: "40px 20px",
           maxWidth: "1200px",
           margin: "0 auto",
+          width: "100%",
+          boxSizing: "border-box",
         }}
       >
         {/* Hero Section */}
@@ -71,7 +104,7 @@ function Home() {
             Share your boldest ideas, showcase your creativity, and explore the
             latest in tech. WRITTES is the home for thinkers and creators.
           </Paragraph>
-          <Space size="middle">
+          <Space size="middle" wrap>
             <Button
               type="primary"
               size="middle"
@@ -88,36 +121,72 @@ function Home() {
           </Space>
         </div>
 
-        {/* Featured Posts Grid */}
-        <Title
-          level={4}
-          style={{
-            color: "green",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            marginBottom: 20,
-            fontSize: "20px",
-          }}
-        >
-          Demo Access
-        </Title>
+        {/* Recruiter Demo Access Card */}
+        <Row justify="center" style={{ marginBottom: 50 }}>
+          <Col xs={24} sm={20} md={16} lg={12}>
+            <Card
+              style={{
+                background: token.colorFillAlter,
+                border: `1px solid ${token.colorBorderSecondary}`,
+              }}
+              styles={{ body: { padding: "28px 28px 24px" } }}
+            >
+              {/* Card Header */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  marginBottom: 6,
+                }}
+              >
+                <Tag color="blue" style={{ margin: 0, fontWeight: 600 }}>
+                  RECRUITER ACCESS
+                </Tag>
+              </div>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <h4>For tester login use the follwing credentials</h4>
-          <p>username as tester</p>
-          <p>password as Test@123</p>
-        </div>
+              <Title level={5} style={{ margin: "0 0 4px", fontSize: 16 }}>
+                Demo Login Credentials
+              </Title>
+              <Text
+                type="secondary"
+                style={{ fontSize: 12, display: "block", marginBottom: 18 }}
+              >
+                Use the credentials below to explore the platform as a fully
+                authenticated user.
+              </Text>
+
+              <Divider style={{ margin: "0 0 16px" }} />
+
+              {/* Credentials */}
+              <Space direction="vertical" size={10} style={{ width: "100%" }}>
+                {credentialRow(
+                  <UserOutlined />,
+                  "Username",
+                  "tester",
+                  "username",
+                )}
+                {credentialRow(
+                  <LockOutlined />,
+                  "Password",
+                  "Test@123",
+                  "password",
+                )}
+              </Space>
+
+              <Divider style={{ margin: "16px 0 14px" }} />
+
+              <div style={{ marginTop: 16 }}>
+                <Button type="primary" block onClick={() => navigate("/login")}>
+                  Go to Login
+                </Button>
+              </div>
+            </Card>
+          </Col>
+        </Row>
 
         {/* Categories / Focus Areas */}
-        <Row gutter={[24, 24]} style={{ marginTop: 50 }}>
+        <Row gutter={[24, 24]}>
           {[
             {
               label: "Share Ideas",

@@ -55,6 +55,7 @@ const writtesDarkTheme = {
 
     colorBgLayout: "#111827",
     colorBgContainer: "#111827",
+    colorFillAlter: "#19233a",
 
     colorBgCard: "#1d2538be",
 
