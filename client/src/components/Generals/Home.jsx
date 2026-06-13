@@ -177,7 +177,11 @@ function Home() {
               <Divider style={{ margin: "16px 0 14px" }} />
 
               <div style={{ marginTop: 16 }}>
-                <Button type="primary" block onClick={() => navigate("/login")}>
+                <Button
+                  type="primary"
+                  block
+                  onClick={() => navigate("/auth/login")}
+                >
                   Go to Login
                 </Button>
               </div>
