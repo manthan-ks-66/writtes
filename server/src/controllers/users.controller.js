@@ -49,7 +49,7 @@ const generateAndDeliverMailPassCode = async (
   );
 
   await resend.emails.send({
-    from: "WRITTES <noreply@auth.writtes.com>",
+    from: "WRITTES <no-reply@auth.writtes.com>",
     to: email,
     subject: subject,
     html: mailHTML,
@@ -332,7 +332,7 @@ const authenticateWithGoogle = asyncHandler(async (req, res) => {
      * Priority 2 - find the user by email (in case user is registered locally & attempt to login with google)
      *
      * this else case will only run when user from the googleId is not found - then find the local user by email
-     * if local user is exist add the googleId and proceed to generate user tokens
+     * if local user exists add the googleId and proceed to generate user tokens
      * if the user from the email is still not found then create the user and proceed further for login
      *
      * - if user by googleId is found - the logic proceeds to generate user tokens

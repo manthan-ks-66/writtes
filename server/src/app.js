@@ -22,9 +22,13 @@ app.use(
 );
 
 // middlewares
-app.use(express.json());
+app.use(
+  express.json({
+    limit: "50mb",
+  }),
+);
 // encode the url that has symbols and special charecters like %_ @#
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
