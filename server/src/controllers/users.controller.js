@@ -24,7 +24,7 @@ const resend = new Resend(process.env.RESEND_VERIFICATION_MAIL_API_KEY);
 const options = {
   httpOnly: true,
   secure: true,
-  sameSite: "None",
+  sameSite: "Strict",
 };
 
 // user OTP generator method
