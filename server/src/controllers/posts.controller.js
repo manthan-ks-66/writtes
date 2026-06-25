@@ -240,7 +240,7 @@ const fetchPost = asyncHandler(async (req, res) => {
     }
   }
 
-  // access userId ( likedBy ) if user is present to find whether user has liked the post
+  // access userId ( likedBy ) if user is logged in to find out whether user has liked the post
   const userId = decodedToken
     ? new mongoose.Types.ObjectId(decodedToken._id)
     : null;

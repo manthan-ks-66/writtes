@@ -24,7 +24,7 @@ const handleAxiosInterceptor = (axiosInstance) => {
       const errMsg = error?.response?.data?.message;
 
       if (
-        errMsg === "Id Expired" &&
+        errMsg === "Token Expired" &&
         errStatusCode === 401 &&
         !originalRequest._retry
       ) {

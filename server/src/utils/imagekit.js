@@ -12,7 +12,9 @@ const uploadToImageKit = async (filePath, fileName, folderName) => {
   try {
     if (!filePath || !fileName) return null;
 
+    // better for handling large files
     const readableFile = fs.createReadStream(filePath);
+
     const res = await imagekit.upload({
       folder: folderName,
       file: readableFile,

@@ -67,7 +67,7 @@ const writtesDarkTheme = {
 
     // Shape & font
     borderRadiusLG: 10,
-    fontFamily: "-apple-system, Roboto, Oxygen, Ubuntu, Cantarell",
+    fontFamily: "BlinkMacSystemFont",
   },
 
   components: {

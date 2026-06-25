@@ -24,7 +24,7 @@ const resend = new Resend(process.env.RESEND_VERIFICATION_MAIL_API_KEY);
 const options = {
   httpOnly: true,
   secure: true,
-  sameSite: "Strict",
+  sameSite: "None",
 };
 
 // user OTP generator method
@@ -767,7 +767,7 @@ const getUserLikedPosts = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid user id");
   }
 
-  // left join of PostLikes (left) with Posts (right) and Posts (array) with Users (right)
+  // left join of PostLikes (left) with Posts (right) and then -> Posts[] (left) with Users (right)
   const userLikedPosts = await PostLike.aggregate([
     {
       $match: {

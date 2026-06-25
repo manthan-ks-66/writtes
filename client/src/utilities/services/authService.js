@@ -1,4 +1,4 @@
-import { userInstance } from "../config/axiosInstances.js";
+import { userInstance } from "../configs/axiosInstances.js";
 
 class AuthService {
   async authenticateWithGoogle({ code }) {

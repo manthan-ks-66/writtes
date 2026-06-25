@@ -63,7 +63,11 @@ const GoogleBtn = () => {
     },
     flow: "auth-code",
     onError: () =>
-      notify.api.error({ title: "Failed to Sign in", placement: "top" }),
+      notify.api.error({
+        title: "Cound not connect with goole",
+        description: "Try again later",
+        placement: "top",
+      }),
   });
 
   return (

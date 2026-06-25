@@ -159,7 +159,7 @@ function Home() {
               <Divider style={{ margin: "0 0 16px" }} />
 
               {/* Credentials */}
-              <Space direction="vertical" size={10} style={{ width: "100%" }}>
+              <Space vertical size={10} style={{ width: "100%" }}>
                 {credentialRow(
                   <UserOutlined />,
                   "Username",

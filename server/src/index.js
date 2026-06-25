@@ -1,7 +1,7 @@
 import app from "./app.js";
 import connect from "./db/dbConnection.js";
 
-let port_no = process.env.PORT_NO || 3000;
+let port_no = process.env.PORT_NO;
 
 connect()
   .then(() => {

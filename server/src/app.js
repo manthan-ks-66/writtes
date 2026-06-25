@@ -10,9 +10,12 @@ const app = express();
 app.use(
   cors({
     origin: [
+      "http://api.localhost:8080",
       "http://localhost:5173",
       "http://localhost:5174",
       "http://localhost:8080",
+      "http://localhost:80",
+      "http://localhost",
       "https://writtes.com",
     ],
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
@@ -21,12 +24,12 @@ app.use(
   }),
 );
 
-// middlewares
 app.use(
   express.json({
     limit: "50mb",
   }),
 );
+
 // encode the url that has symbols and special charecters like %_ @#
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.static("public"));
@@ -47,9 +50,9 @@ import postsRouter from "./routes/posts.routes.js";
 import commentsRouter from "./routes/comments.routes.js";
 
 // route declarations
-app.use("/api/v1/users", usersRouter);
-app.use("/api/v1/posts", postsRouter);
-app.use("/api/v1/comments", commentsRouter);
+app.use("/v1/users", usersRouter);
+app.use("/v1/posts", postsRouter);
+app.use("/v1/comments", commentsRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
