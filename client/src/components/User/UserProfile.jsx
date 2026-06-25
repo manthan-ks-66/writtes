@@ -121,7 +121,7 @@ function UserProfile() {
     try {
       notify.api.info({
         title: "Updating Avatar",
-        description: "Please wait while updation is in process...",
+        description: "Please wait while update is in process...",
         placement: "top",
       });
 
@@ -148,7 +148,7 @@ function UserProfile() {
   const handleNotifyRemove = () => {
     if (!user?.avatar) {
       notify.api.error({
-        title: "You have not added avatar picture",
+        title: "You have not added your avatar",
         placement: "top",
       });
       return;
