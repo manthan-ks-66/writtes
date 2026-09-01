@@ -235,12 +235,12 @@ const fetchPost = asyncHandler(async (req, res) => {
       decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
-        // continue to fetch the post for logged out user
+        // continue to fetch post for logged out user
       }
     }
   }
 
-  // access userId ( likedBy ) if user is logged in to find out whether user has liked the post
+  // access userId ( likedBy ) if the user is logged in to find out whether user has liked the post
   const userId = decodedToken
     ? new mongoose.Types.ObjectId(decodedToken._id)
     : null;

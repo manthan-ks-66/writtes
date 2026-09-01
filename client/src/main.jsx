@@ -219,7 +219,7 @@ const router = createBrowserRouter([
         ),
       },
 
-      // verify email for password reset
+      // email input component for password reset process
       {
         path: "/auth/forgot-password",
         element: (
@@ -229,7 +229,7 @@ const router = createBrowserRouter([
         ),
       },
 
-      // reset the user password
+      // reset the user password component
       {
         path: "/auth/forgot-password/reset/verify",
         element: (
