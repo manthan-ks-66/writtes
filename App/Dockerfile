@@ -4,17 +4,17 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-COPY client/package*.json ./
+COPY Frontend/package*.json ./
 
 RUN npm install
 
-COPY client/ .
+COPY Frontend/ .
 
 RUN npm run build
 
 # stage 2 - Nginx
 FROM nginx:alpine
 
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY Application/default.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=builder /app/dist /usr/share/nginx/html

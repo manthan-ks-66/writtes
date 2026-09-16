@@ -1,23 +1,23 @@
 services:
   s-one:
     build:
-      context: ./server
+      context: ./Backend
     networks:
       - writtes-net
   s-two:
     build:
-      context: ./server
+      context: ./Backend
     networks:
       - writtes-net
   s-three:
     build:
-      context: ./server
+      context: ./Backend
     networks:
       - writtes-net
   app:
     build:
       context: .
-      dockerfile: nginx/Dockerfile
+      dockerfile: Application/Dockerfile
     depends_on:
       - s-one
       - s-two
